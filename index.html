@@ -132,24 +132,17 @@
           </div>
           <div>
             <label for="nivel">Nível</label>
-            <select id="nivel">
-              <option value="a2">A2 Key for Schools</option>
-              <option value="b1" disabled>B1 Preliminary (em breve)</option>
-              <option value="b2" disabled>B2 First (em breve)</option>
-              <option value="c1" disabled>C1 Advanced (em breve)</option>
-            </select>
+            <select id="nivel"></select>
           </div>
         </div>
 
         <label for="tarefa">Tipo de tarefa</label>
-        <select id="tarefa">
-          <option value="part6_email" data-min="25">Part 6 — E-mail (mín. 25 palavras)</option>
-          <option value="part7_story" data-min="35">Part 7 — Story (mín. 35 palavras)</option>
-        </select>
+        <select id="tarefa"></select>
+        <div class="hint" id="aviso-nivel" hidden></div>
 
         <label for="enunciado">Enunciado da tarefa</label>
         <textarea id="enunciado" style="min-height:80px" required
-          placeholder="Cole o enunciado que o aluno recebeu, com os três pontos a responder. Para a Part 7, descreva as três imagens em texto."></textarea>
+          placeholder="Cole o enunciado que o aluno recebeu, exatamente como ele o viu."></textarea>
 
         <label>Redação manuscrita (OCR)</label>
         <div class="drop" id="drop">
@@ -191,8 +184,19 @@ const CONFIG = {
   logo: "assets/logo.png"  // PNG oficial do Drive (NUSA › Logos › RGB › PNG)
 };
 
-const CORES = { content: "var(--azul)", organisation: "var(--amarelo)", language: "var(--rosa)" };
-const CHIP  = { DISTINCTION: "chip-dist", MERIT: "chip-merit", PASS: "chip-pass", UNSATISFACTORY: "chip-unsat" };
+const CORES = {
+  content:                   "var(--azul)",
+  communicative_achievement: "var(--roxo)",
+  organisation:              "var(--amarelo)",
+  language:                  "var(--rosa)"
+};
+const NOMES = {
+  content: "Content",
+  communicative_achievement: "Communicative Achievement",
+  organisation: "Organisation",
+  language: "Language"
+};
+const CHIP = { DISTINCTION: "chip-dist", MERIT: "chip-merit", PASS: "chip-pass", UNSATISFACTORY: "chip-unsat" };
 
 const $ = id => document.getElementById(id);
 const painel = $("painel");
@@ -202,11 +206,68 @@ const painel = $("painel");
   i.onload = () => { $("mark").innerHTML = `<img src="${CONFIG.logo}" alt="Togethere">`; };
   i.src = CONFIG.logo; })();
 
-/* Contador de palavras + mínimo por tarefa */
+/* ── Níveis e tarefas: tudo vem de data/levels.json ──
+   Nenhuma lista de tarefa fica escrita à mão aqui. Nível novo = editar o JSON. */
+let LEVELS = null;
+
+(async () => {
+  try {
+    LEVELS = await (await fetch("data/levels.json")).json();
+  } catch {
+    $("aviso-nivel").hidden = false;
+    $("aviso-nivel").className = "hint warn";
+    $("aviso-nivel").textContent = "Não carreguei data/levels.json. Abra o site via servidor, não pelo arquivo.";
+    return;
+  }
+
+  const nivel = $("nivel");
+  nivel.innerHTML = LEVELS.levels.map(l =>
+    `<option value="${l.id}"${l.enabled ? "" : " disabled"}>${l.label}${l.enabled ? "" : " (em breve)"}</option>`
+  ).join("");
+  nivel.value = "a2";
+  nivel.addEventListener("change", montarTarefas);
+  montarTarefas();
+})();
+
+function nivelAtual(){ return LEVELS?.levels.find(l => l.id === $("nivel").value); }
+
+function montarTarefas(){
+  const l = nivelAtual();
+  if (!l) return;
+
+  $("tarefa").innerHTML = l.tasks.map(t => {
+    const faixa = t.max_words ? `${t.min_words}–${t.max_words} palavras`
+                              : `mín. ${t.min_words} palavras`;
+    return `<option value="${t.id}" data-min="${t.min_words}" data-free="${!!t.free}">${t.label} · ${faixa}</option>`;
+  }).join("");
+
+  $("tarefa").onchange = aoTrocarTarefa;
+  aoTrocarTarefa();
+}
+
+function aoTrocarTarefa(){
+  const opt = $("tarefa").selectedOptions[0];
+  const l = nivelAtual();
+  $("minimo").textContent = opt.dataset.min;
+
+  const aviso = $("aviso-nivel");
+  if (opt.dataset.free === "true") {
+    aviso.hidden = false;
+    aviso.className = "hint warn";
+    aviso.textContent = "Texto livre: o motor aplica a régua de " + l.label +
+      " a um texto fora do formato do exame. Descreva bem no enunciado o gênero e para quem o aluno escreveu — é isso que sustenta a nota de Communicative Achievement.";
+  } else if (l && l.calibrated === false) {
+    aviso.hidden = false;
+    aviso.className = "hint warn";
+    aviso.textContent = "Motor não calibrado neste nível — revisão do professor é obrigatória.";
+  } else {
+    aviso.hidden = true;
+  }
+}
+
+/* Contador de palavras */
 const contar = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 $("texto").addEventListener("input", () => $("contador").textContent = contar($("texto").value));
-$("tarefa").addEventListener("change", e =>
-  $("minimo").textContent = e.target.selectedOptions[0].dataset.min);
 
 /* ── Upload ── */
 const drop = $("drop"), file = $("file");
@@ -327,6 +388,7 @@ $("form").addEventListener("submit", async e => {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         student:     $("aluno").value,
+        level:       $("nivel").value,
         task_part:   $("tarefa").value,
         task_prompt: $("enunciado").value,
         text
@@ -350,11 +412,14 @@ $("demo").addEventListener("click", async () => {
 const carregando = msg =>
   painel.innerHTML = `<h2>Relatório</h2><div class="loading"><div class="spin"></div>${msg}</div>`;
 
-/* ── Render (contrato de motor/prompt_a2.md) ── */
+/* ── Render (contrato dos motor/prompt_*.md) ──
+   As subescalas vêm no próprio resultado: 3 no A2, 4 do B1 pra cima. */
 function render(d){
+  const subs = d.subscales ?? ["content", "organisation", "language"];
+
   const barra = k => `
     <div class="bar">
-      <div class="top"><span>${k[0].toUpperCase() + k.slice(1)}</span><span><b>${d[k]?.band ?? "—"}</b> / 5</span></div>
+      <div class="top"><span>${NOMES[k] ?? k}</span><span><b>${d[k]?.band ?? "—"}</b> / 5</span></div>
       <div class="track"><div class="fill" style="width:${(d[k]?.band ?? 0) / 5 * 100}%;background:${CORES[k]}"></div></div>
       <div class="why">${d[k]?.justification ?? ""}</div>
     </div>`;
@@ -380,7 +445,7 @@ function render(d){
     </div>
     <div class="meta">${d.student ? d.student + " · " : ""}${palavras}</div>
 
-    ${["content", "organisation", "language"].map(barra).join("")}
+    ${subs.map(barra).join("")}
 
     ${d.summary_pt ? `<div class="sec"><h3>Para o aluno e a família</h3><div class="resumo">${d.summary_pt}</div></div>` : ""}
     ${d.strengths?.length ? `<div class="sec"><h3>O que funcionou bem</h3><ul>${li(d.strengths)}</ul></div>` : ""}
