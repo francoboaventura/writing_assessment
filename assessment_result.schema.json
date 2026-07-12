@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://togethere.com.br/schemas/assessment_result.json",
+  "title": "Writing Assessment Result",
+  "description": "Contrato de saída do motor de avaliação. O backend devolve este objeto; o frontend (index.html) renderiza a partir dele.",
+  "type": "object",
+  "required": ["bands", "cefr"],
+  "properties": {
+    "student":        { "type": "string", "description": "Nome do aluno." },
+    "level":          { "type": "string", "enum": ["a1", "a2", "b1", "b2", "c1", "c2"] },
+    "task_part":      { "type": "string", "enum": ["part6_email", "part7_story"], "description": "Tipos de tarefa do A2 Key for Schools. Outros níveis acrescentam os seus." },
+    "text":           { "type": "string", "description": "Texto do aluno (transcrito por OCR quando manuscrito)." },
+    "word_count":     { "type": "integer", "minimum": 0 },
+    "bands": {
+      "type": "object",
+      "description": "Cambridge Writing Assessment Scale — cada subescala de 0 a 5.",
+      "required": ["content", "organisation", "language"],
+      "properties": {
+        "content":      { "type": "integer", "minimum": 0, "maximum": 5 },
+        "organisation": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "language":     { "type": "integer", "minimum": 0, "maximum": 5 }
+      },
+      "additionalProperties": false
+    },
+    "overall":        { "type": "string", "description": "Média das subescalas, uma casa decimal." },
+    "cefr":           { "type": "string", "description": "Nível CEFR resultante (A1–C2)." },
+    "togethere_band": { "type": "string", "description": "Banda interna Togethere, conforme o Guia Pedagógico." },
+    "rationale": {
+      "type": "object",
+      "description": "Justificativa de cada banda, na linguagem do descritor Cambridge.",
+      "properties": {
+        "content":      { "type": "string" },
+        "organisation": { "type": "string" },
+        "language":     { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "strengths":   { "type": "array", "items": { "type": "string" }, "description": "O que funcionou bem. Sempre antes das correções." },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["original", "correction"],
+        "properties": {
+          "type":       { "type": "string", "description": "gramática | spelling | vocabulário | pontuação | preposição | registro" },
+          "original":   { "type": "string" },
+          "correction": { "type": "string" },
+          "note":       { "type": "string", "description": "Explicação curta, em tom encorajador e apropriado à idade." }
+        },
+        "additionalProperties": false
+      }
+    },
+    "suggestions":    { "type": "array", "items": { "type": "string" }, "description": "Ações concretas para a próxima redação." },
+    "assessed_at":    { "type": "string", "format": "date-time" },
+    "engine_version": { "type": "string" }
+  },
+  "additionalProperties": false
+}

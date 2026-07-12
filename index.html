@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Togethere · Writing Assessment</title>
+<meta name="description" content="Avaliação automática de writing contra as escalas oficiais do Cambridge English — Togethere.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@1,600&family=Urbanist:ital,wght@0,300;0,500;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  /* ── Identidade visual Togethere (Manual da Identidade Visual, Nusa Brands) ── */
+  :root{
+    /* Cores principais */
+    --azul:        #005EAF;
+    --vermelho:    #E52524;
+    --amarelo:     #FFC800;
+    /* Cores de apoio */
+    --rosa:        #FF005F;
+    --laranja:     #FF2A00;
+    --azul-escuro: #002B64;
+    --roxo:        #DF6DFF;
+    /* Neutros */
+    --branco:      #FFFFFF;
+    --cinza-bg:    #F4F7FA;
+    --cinza-linha: #DCE4EC;
+    --texto:       #1A2330;
+    --texto-fraco: #5B6878;
+
+    --radius: 14px;
+    --sombra: 0 2px 16px rgba(0,43,100,.08);
+    --titulo: "Zilla Slab", Georgia, serif;   /* SemiBold Italic — títulos */
+    --corpo:  "Urbanist", system-ui, sans-serif; /* Light — textos */
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--cinza-bg); color:var(--texto);
+    font-family:var(--corpo); font-weight:300; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:var(--titulo); font-weight:600; font-style:italic; margin:0}
+  a{color:var(--azul)}
+
+  /* Elementos gráficos da marca: esferas e feijões */
+  .blobs{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0}
+  .blobs span{position:absolute; border-radius:50%; opacity:.10; filter:blur(2px)}
+  .b1{width:420px;height:420px;background:var(--azul);top:-140px;right:-120px}
+  .b2{width:260px;height:260px;background:var(--amarelo);bottom:-90px;left:-70px}
+  .b3{width:180px;height:180px;background:var(--roxo);top:45%;left:-90px}
+
+  .wrap{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:28px 20px 72px}
+
+  /* Header */
+  header{display:flex; align-items:center; gap:14px; margin-bottom:26px}
+  .mark{width:44px;height:44px;flex:0 0 44px;border-radius:12px;background:var(--azul);
+        display:grid;place-items:center;color:#fff;font-family:var(--titulo);font-style:italic;
+        font-weight:600;font-size:24px;line-height:1;box-shadow:var(--sombra)}
+  .mark img{width:100%;height:100%;object-fit:contain;border-radius:12px}
+  .brand h1{font-size:22px;letter-spacing:.2px}
+  .brand p{margin:0;font-size:13px;color:var(--texto-fraco);font-style:italic}
+
+  /* Cards */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--branco);border:1px solid var(--cinza-linha);border-radius:var(--radius);
+        padding:22px;box-shadow:var(--sombra)}
+  .card h2{font-size:17px;margin-bottom:14px}
+
+  label{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+        color:var(--texto-fraco);margin:14px 0 6px}
+  input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--cinza-linha);
+        border-radius:10px;font-family:var(--corpo);font-size:15px;background:#fff;color:var(--texto)}
+  textarea{min-height:170px;resize:vertical;line-height:1.6}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--azul);outline-offset:1px;border-color:var(--azul)}
+  .row{display:flex;gap:12px}
+  .row>*{flex:1}
+  .hint{font-size:12px;color:var(--texto-fraco);margin-top:6px}
+
+  .drop{border:2px dashed var(--cinza-linha);border-radius:12px;padding:20px;text-align:center;
+        font-size:14px;color:var(--texto-fraco);cursor:pointer;transition:.15s}
+  .drop:hover,.drop.over{border-color:var(--azul);background:#F0F6FC;color:var(--azul)}
+  .drop img{max-width:100%;border-radius:8px;margin-top:12px}
+
+  .btn{margin-top:20px;width:100%;padding:14px;border:0;border-radius:999px;background:var(--azul);
+       color:#fff;font-family:var(--corpo);font-weight:700;font-size:15px;letter-spacing:.3px;cursor:pointer;
+       transition:.15s}
+  .btn:hover{background:var(--azul-escuro)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-ghost{background:transparent;color:var(--azul);border:1.5px solid var(--azul)}
+  .btn-ghost:hover{background:#F0F6FC;color:var(--azul-escuro)}
+
+  /* Resultado */
+  .empty{color:var(--texto-fraco);font-size:14px;text-align:center;padding:40px 10px}
+  .overall{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .overall b{font-family:var(--titulo);font-style:italic;font-size:38px;color:var(--azul)}
+  .chip{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;
+        background:#E6F0F9;color:var(--azul-escuro)}
+
+  .bar{margin:16px 0}
+  .bar .top{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px}
+  .track{height:9px;border-radius:999px;background:var(--cinza-linha);overflow:hidden}
+  .fill{height:100%;border-radius:999px;transition:width .5s ease}
+  .bar .why{font-size:12.5px;color:var(--texto-fraco);margin-top:6px}
+
+  .sec{margin-top:22px;padding-top:18px;border-top:1px solid var(--cinza-linha)}
+  .sec h3{font-size:14px;margin-bottom:10px}
+  ul{margin:0;padding-left:18px}
+  li{margin-bottom:8px;font-size:14.5px}
+  .err{background:#FFF3F3;border-left:3px solid var(--vermelho);padding:9px 12px;border-radius:0 8px 8px 0;
+       margin-bottom:9px;font-size:14px}
+  .err s{color:var(--vermelho);text-decoration-thickness:1.5px}
+  .err b{color:#0A7A3D}
+  .err .tag{display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;
+       color:var(--texto-fraco);font-weight:700;margin-right:6px}
+
+  .loading{text-align:center;padding:40px;color:var(--texto-fraco);font-size:14px}
+  .spin{width:26px;height:26px;border:3px solid var(--cinza-linha);border-top-color:var(--azul);
+        border-radius:50%;margin:0 auto 12px;animation:r .8s linear infinite}
+  @keyframes r{to{transform:rotate(360deg)}}
+
+  .note{margin-top:22px;font-size:12px;color:var(--texto-fraco);text-align:center}
+  @media print{.blobs,form,.btn,.note{display:none}.card{box-shadow:none;border:0}}
+</style>
+</head>
+<body>
+<div class="blobs"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+
+<div class="wrap">
+  <header>
+    <div class="mark" id="mark">T</div>
+    <div class="brand">
+      <h1>Writing Assessment</h1>
+      <p>Togethere — inglês para chegar lá</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ENVIO -->
+    <section class="card">
+      <h2>Enviar redação</h2>
+      <form id="form">
+        <div class="row">
+          <div>
+            <label for="aluno">Aluno</label>
+            <input id="aluno" placeholder="Nome do aluno" required>
+          </div>
+          <div>
+            <label for="nivel">Nível</label>
+            <select id="nivel">
+              <option value="a2">A2 Key for Schools</option>
+              <option value="b1" disabled>B1 Preliminary (em breve)</option>
+              <option value="b2" disabled>B2 First (em breve)</option>
+              <option value="c1" disabled>C1 Advanced (em breve)</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="tarefa">Tipo de tarefa</label>
+        <select id="tarefa">
+          <option value="part6_email">Part 6 — E-mail (mín. 25 palavras)</option>
+          <option value="part7_story">Part 7 — Story (mín. 35 palavras)</option>
+        </select>
+
+        <label for="enunciado">Enunciado da tarefa</label>
+        <textarea id="enunciado" style="min-height:80px" placeholder="Cole aqui o enunciado que o aluno recebeu, com os três pontos a responder." required></textarea>
+
+        <label for="texto">Texto do aluno</label>
+        <textarea id="texto" placeholder="Cole o texto digitado — ou envie a foto da redação manuscrita abaixo para o OCR."></textarea>
+        <div class="hint"><span id="contador">0</span> palavras</div>
+
+        <label>Redação manuscrita (OCR)</label>
+        <div class="drop" id="drop">
+          Clique ou arraste uma foto/scan da redação
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+
+        <button class="btn" type="submit" id="enviar">Avaliar</button>
+        <button class="btn btn-ghost" type="button" id="demo">Ver exemplo (modo demo)</button>
+      </form>
+    </section>
+
+    <!-- RESULTADO -->
+    <section class="card" id="painel">
+      <h2>Relatório</h2>
+      <div class="empty" id="vazio">O relatório aparece aqui depois da avaliação.</div>
+    </section>
+  </div>
+
+  <p class="note">
+    Bandas conforme a Cambridge Writing Assessment Scale (Content · Organisation · Language).
+    Avaliação assistida por IA — a nota final é sempre validada por um professor.
+  </p>
+</div>
+
+<script>
+/* ───────────── Configuração ─────────────
+   Aponte para o seu backend. NUNCA coloque a chave da API aqui:
+   o front chama o backend, e o backend fala com o modelo.        */
+const CONFIG = {
+  apiUrl: "",              // ex.: "https://api.togethere.com.br/assess"
+  logo: "assets/logo.png"  // baixe o PNG oficial do Drive (Logos/RGB/PNG)
+};
+
+const CORES = { content:"var(--azul)", organisation:"var(--amarelo)", language:"var(--rosa)" };
+const NOMES = { content:"Content", organisation:"Organisation", language:"Language" };
+
+/* Logo: usa o PNG oficial se existir, senão mantém o monograma */
+(() => {
+  const img = new Image();
+  img.onload = () => { document.getElementById("mark").innerHTML = `<img src="${CONFIG.logo}" alt="Togethere">`; };
+  img.src = CONFIG.logo;
+})();
+
+/* Contador de palavras */
+const texto = document.getElementById("texto");
+const contador = document.getElementById("contador");
+texto.addEventListener("input", () => {
+  contador.textContent = texto.value.trim() ? texto.value.trim().split(/\s+/).length : 0;
+});
+
+/* Upload / OCR */
+const drop = document.getElementById("drop"), file = document.getElementById("file");
+let imagemBase64 = null;
+drop.addEventListener("click", () => file.click());
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => {
+  e.preventDefault(); drop.classList.remove("over");
+  if (e.dataTransfer.files[0]) lerImagem(e.dataTransfer.files[0]);
+});
+file.addEventListener("change", () => file.files[0] && lerImagem(file.files[0]));
+
+function lerImagem(f){
+  const r = new FileReader();
+  r.onload = () => {
+    imagemBase64 = r.result;
+    drop.innerHTML = `<strong>${f.name}</strong><br><small>será transcrita por OCR no servidor</small><img src="${r.result}" alt="">`;
+  };
+  r.readAsDataURL(f);
+}
+
+/* Envio */
+document.getElementById("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!texto.value.trim() && !imagemBase64) { alert("Cole o texto do aluno ou envie a foto da redação."); return; }
+
+  const payload = {
+    student:   document.getElementById("aluno").value,
+    level:     document.getElementById("nivel").value,
+    task_part: document.getElementById("tarefa").value,
+    task_prompt: document.getElementById("enunciado").value,
+    text:  texto.value.trim() || null,
+    image: imagemBase64 || null
+  };
+
+  if (!CONFIG.apiUrl) {
+    alert("Nenhum backend configurado. Defina CONFIG.apiUrl no index.html — ou use o modo demo.");
+    return;
+  }
+
+  carregando();
+  try {
+    const r = await fetch(CONFIG.apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    render(await r.json());
+  } catch (err) {
+    document.getElementById("painel").innerHTML =
+      `<h2>Relatório</h2><div class="empty">Falha ao avaliar: ${err.message}</div>`;
+  }
+});
+
+/* Demo com um resultado de exemplo (data/sample_result.json) */
+document.getElementById("demo").addEventListener("click", async () => {
+  carregando();
+  try {
+    const r = await fetch("data/sample_result.json");
+    render(await r.json());
+  } catch {
+    document.getElementById("painel").innerHTML =
+      `<h2>Relatório</h2><div class="empty">Abra o site via servidor (ou GitHub Pages) para carregar o exemplo.</div>`;
+  }
+});
+
+function carregando(){
+  document.getElementById("painel").innerHTML =
+    `<h2>Relatório</h2><div class="loading"><div class="spin"></div>Avaliando contra a escala Cambridge…</div>`;
+}
+
+function render(d){
+  const barra = k => `
+    <div class="bar">
+      <div class="top"><span>${NOMES[k]}</span><span><b>${d.bands[k]}</b> / 5</span></div>
+      <div class="track"><div class="fill" style="width:${d.bands[k]/5*100}%;background:${CORES[k]}"></div></div>
+      <div class="why">${d.rationale?.[k] ?? ""}</div>
+    </div>`;
+
+  const erros = (d.errors ?? []).map(e => `
+    <div class="err"><span class="tag">${e.type ?? "erro"}</span>
+      <s>${e.original}</s> → <b>${e.correction}</b>
+      ${e.note ? `<div class="why">${e.note}</div>` : ""}
+    </div>`).join("");
+
+  const sugestoes = (d.suggestions ?? []).map(s => `<li>${s}</li>`).join("");
+  const elogios   = (d.strengths ?? []).map(s => `<li>${s}</li>`).join("");
+
+  document.getElementById("painel").innerHTML = `
+    <h2>Relatório</h2>
+    <div class="overall">
+      <b>${d.overall ?? "—"}</b>
+      <span class="chip">${d.cefr ?? ""}${d.togethere_band ? " · " + d.togethere_band : ""}</span>
+    </div>
+    <div class="why" style="font-size:13px;color:var(--texto-fraco)">
+      ${d.student ? d.student + " · " : ""}${d.word_count ?? "?"} palavras
+    </div>
+    ${["content","organisation","language"].map(barra).join("")}
+    ${elogios   ? `<div class="sec"><h3>O que funcionou bem</h3><ul>${elogios}</ul></div>` : ""}
+    ${erros     ? `<div class="sec"><h3>Correções</h3>${erros}</div>` : ""}
+    ${sugestoes ? `<div class="sec"><h3>Como melhorar</h3><ul>${sugestoes}</ul></div>` : ""}
+    <button class="btn btn-ghost" onclick="window.print()">Imprimir / salvar em PDF</button>`;
+}
+</script>
+</body>
+</html>

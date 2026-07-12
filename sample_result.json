@@ -1,0 +1,35 @@
+{
+  "student": "Aluno exemplo",
+  "level": "a2",
+  "task_part": "part6_email",
+  "word_count": 34,
+  "text": "Hello Chris! Next Saturday we coming to the local museum. Your must bring: bootle of water, some food, and 5 Euro. We can see many super since. We travel at museum on bus. Goodbye!",
+  "bands": { "content": 4, "organisation": 3, "language": 3 },
+  "overall": "3.3",
+  "cefr": "A2",
+  "togethere_band": "Kids 4",
+  "rationale": {
+    "content": "Os três pontos do enunciado foram respondidos. O leitor fica informado, embora 'many super since' deixe o segundo ponto pouco claro.",
+    "organisation": "O texto é conectado com conectores básicos de alta frequência ('and'). Abertura e fecho apropriados para um e-mail.",
+    "language": "Vocabulário básico usado de forma razoavelmente apropriada. Formas gramaticais simples com algum controle; os erros por vezes dificultam o sentido."
+  },
+  "strengths": [
+    "Abertura e fecho de e-mail corretos — 'Hello Chris!' e 'Goodbye!'.",
+    "Os três pontos do enunciado foram respondidos, na ordem pedida.",
+    "Uso de lista com dois-pontos para o que trazer: uma boa escolha de organização."
+  ],
+  "errors": [
+    { "type": "gramática", "original": "we coming", "correction": "we are coming", "note": "Present continuous precisa do verbo 'to be': we are coming." },
+    { "type": "pronome",   "original": "Your must bring", "correction": "You must bring", "note": "'Your' é possessivo. O sujeito é 'You'." },
+    { "type": "spelling",  "original": "bootle", "correction": "bottle", "note": "Atenção ao 'tt'." },
+    { "type": "vocabulário", "original": "many super since", "correction": "many amazing things", "note": "A frase não fica clara. Escolha palavras que você já domina." },
+    { "type": "preposição", "original": "We travel at museum on bus", "correction": "We will travel to the museum by bus", "note": "Transporte: 'by bus'. Destino: 'to the museum'." }
+  ],
+  "suggestions": [
+    "Revise o present continuous (am/is/are + -ing) — foi o erro mais frequente aqui.",
+    "Ao falar de planos futuros, use 'we will' ou 'we are going to'.",
+    "Antes de entregar, releia procurando só verbos: cada frase tem um verbo completo?"
+  ],
+  "assessed_at": "2026-07-12T00:00:00Z",
+  "engine_version": "0.1"
+}
