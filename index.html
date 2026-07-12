@@ -11,56 +11,35 @@
 <style>
   /* ── Identidade visual Togethere (Manual da Identidade Visual, Nusa Brands) ── */
   :root{
-    /* Cores principais */
-    --azul:        #005EAF;
-    --vermelho:    #E52524;
-    --amarelo:     #FFC800;
-    /* Cores de apoio */
-    --rosa:        #FF005F;
-    --laranja:     #FF2A00;
-    --azul-escuro: #002B64;
-    --roxo:        #DF6DFF;
-    /* Neutros */
-    --branco:      #FFFFFF;
-    --cinza-bg:    #F4F7FA;
-    --cinza-linha: #DCE4EC;
-    --texto:       #1A2330;
-    --texto-fraco: #5B6878;
-
-    --radius: 14px;
-    --sombra: 0 2px 16px rgba(0,43,100,.08);
-    --titulo: "Zilla Slab", Georgia, serif;   /* SemiBold Italic — títulos */
-    --corpo:  "Urbanist", system-ui, sans-serif; /* Light — textos */
+    --azul:#005EAF; --vermelho:#E52524; --amarelo:#FFC800;
+    --rosa:#FF005F; --laranja:#FF2A00; --azul-escuro:#002B64; --roxo:#DF6DFF;
+    --branco:#FFFFFF; --cinza-bg:#F4F7FA; --cinza-linha:#DCE4EC;
+    --texto:#1A2330; --texto-fraco:#5B6878; --verde:#0A7A3D;
+    --radius:14px; --sombra:0 2px 16px rgba(0,43,100,.08);
+    --titulo:"Zilla Slab",Georgia,serif;      /* SemiBold Italic — títulos */
+    --corpo:"Urbanist",system-ui,sans-serif;  /* Light — textos */
   }
-
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--cinza-bg); color:var(--texto);
-    font-family:var(--corpo); font-weight:300; line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-  }
-  h1,h2,h3{font-family:var(--titulo); font-weight:600; font-style:italic; margin:0}
-  a{color:var(--azul)}
+  body{margin:0;background:var(--cinza-bg);color:var(--texto);font-family:var(--corpo);
+       font-weight:300;line-height:1.55;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:var(--titulo);font-weight:600;font-style:italic;margin:0}
 
-  /* Elementos gráficos da marca: esferas e feijões */
-  .blobs{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0}
-  .blobs span{position:absolute; border-radius:50%; opacity:.10; filter:blur(2px)}
+  /* Elementos gráficos da marca: esferas */
+  .blobs{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  .blobs span{position:absolute;border-radius:50%;opacity:.10;filter:blur(2px)}
   .b1{width:420px;height:420px;background:var(--azul);top:-140px;right:-120px}
   .b2{width:260px;height:260px;background:var(--amarelo);bottom:-90px;left:-70px}
   .b3{width:180px;height:180px;background:var(--roxo);top:45%;left:-90px}
 
-  .wrap{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:28px 20px 72px}
-
-  /* Header */
-  header{display:flex; align-items:center; gap:14px; margin-bottom:26px}
-  .mark{width:44px;height:44px;flex:0 0 44px;border-radius:12px;background:var(--azul);
-        display:grid;place-items:center;color:#fff;font-family:var(--titulo);font-style:italic;
-        font-weight:600;font-size:24px;line-height:1;box-shadow:var(--sombra)}
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:28px 20px 72px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+  .mark{width:44px;height:44px;flex:0 0 44px;border-radius:12px;background:var(--azul);display:grid;
+        place-items:center;color:#fff;font-family:var(--titulo);font-style:italic;font-weight:600;
+        font-size:24px;line-height:1;box-shadow:var(--sombra)}
   .mark img{width:100%;height:100%;object-fit:contain;border-radius:12px}
-  .brand h1{font-size:22px;letter-spacing:.2px}
+  .brand h1{font-size:22px}
   .brand p{margin:0;font-size:13px;color:var(--texto-fraco);font-style:italic}
 
-  /* Cards */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
   @media(max-width:860px){.grid{grid-template-columns:1fr}}
   .card{background:var(--branco);border:1px solid var(--cinza-linha);border-radius:var(--radius);
@@ -69,39 +48,44 @@
 
   label{display:block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
         color:var(--texto-fraco);margin:14px 0 6px}
-  input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--cinza-linha);
-        border-radius:10px;font-family:var(--corpo);font-size:15px;background:#fff;color:var(--texto)}
-  textarea{min-height:170px;resize:vertical;line-height:1.6}
+  input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--cinza-linha);border-radius:10px;
+        font-family:var(--corpo);font-size:15px;background:#fff;color:var(--texto)}
+  textarea{min-height:160px;resize:vertical;line-height:1.6}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--azul);outline-offset:1px;border-color:var(--azul)}
-  .row{display:flex;gap:12px}
-  .row>*{flex:1}
+  .row{display:flex;gap:12px}.row>*{flex:1}
   .hint{font-size:12px;color:var(--texto-fraco);margin-top:6px}
+  .hint.warn{color:var(--laranja);font-weight:500}
 
-  .drop{border:2px dashed var(--cinza-linha);border-radius:12px;padding:20px;text-align:center;
-        font-size:14px;color:var(--texto-fraco);cursor:pointer;transition:.15s}
+  .drop{border:2px dashed var(--cinza-linha);border-radius:12px;padding:20px;text-align:center;font-size:14px;
+        color:var(--texto-fraco);cursor:pointer;transition:.15s}
   .drop:hover,.drop.over{border-color:var(--azul);background:#F0F6FC;color:var(--azul)}
   .drop img{max-width:100%;border-radius:8px;margin-top:12px}
 
-  .btn{margin-top:20px;width:100%;padding:14px;border:0;border-radius:999px;background:var(--azul);
-       color:#fff;font-family:var(--corpo);font-weight:700;font-size:15px;letter-spacing:.3px;cursor:pointer;
-       transition:.15s}
+  .btn{margin-top:14px;width:100%;padding:14px;border:0;border-radius:999px;background:var(--azul);color:#fff;
+       font-family:var(--corpo);font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
   .btn:hover{background:var(--azul-escuro)}
   .btn:disabled{opacity:.5;cursor:not-allowed}
   .btn-ghost{background:transparent;color:var(--azul);border:1.5px solid var(--azul)}
   .btn-ghost:hover{background:#F0F6FC;color:var(--azul-escuro)}
+  .btn-amarelo{background:var(--amarelo);color:var(--azul-escuro)}
+  .btn-amarelo:hover{background:#E6B400}
 
-  /* Resultado */
   .empty{color:var(--texto-fraco);font-size:14px;text-align:center;padding:40px 10px}
-  .overall{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
-  .overall b{font-family:var(--titulo);font-style:italic;font-size:38px;color:var(--azul)}
-  .chip{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;
-        background:#E6F0F9;color:var(--azul-escuro)}
+  .overall{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .overall b{font-family:var(--titulo);font-style:italic;font-size:40px;color:var(--azul);line-height:1}
+  .overall .de{font-size:13px;color:var(--texto-fraco)}
+  .chip{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.4px}
+  .chip-dist{background:#E6F0F9;color:var(--azul-escuro)}
+  .chip-merit{background:#FFF6D6;color:#7A5B00}
+  .chip-pass{background:#E7F6ED;color:var(--verde)}
+  .chip-unsat{background:#FFEDED;color:var(--vermelho)}
+  .meta{font-size:13px;color:var(--texto-fraco)}
 
   .bar{margin:16px 0}
   .bar .top{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px}
   .track{height:9px;border-radius:999px;background:var(--cinza-linha);overflow:hidden}
   .fill{height:100%;border-radius:999px;transition:width .5s ease}
-  .bar .why{font-size:12.5px;color:var(--texto-fraco);margin-top:6px}
+  .why{font-size:12.5px;color:var(--texto-fraco);margin-top:6px}
 
   .sec{margin-top:22px;padding-top:18px;border-top:1px solid var(--cinza-linha)}
   .sec h3{font-size:14px;margin-bottom:10px}
@@ -110,15 +94,17 @@
   .err{background:#FFF3F3;border-left:3px solid var(--vermelho);padding:9px 12px;border-radius:0 8px 8px 0;
        margin-bottom:9px;font-size:14px}
   .err s{color:var(--vermelho);text-decoration-thickness:1.5px}
-  .err b{color:#0A7A3D}
+  .err b{color:var(--verde)}
   .err .tag{display:inline-block;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;
        color:var(--texto-fraco);font-weight:700;margin-right:6px}
+  .resumo{background:#F0F6FC;border-radius:10px;padding:14px;font-size:14.5px}
+  .flag{margin-top:16px;font-size:12.5px;color:var(--texto-fraco);display:flex;gap:7px;align-items:baseline}
+  .dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}
 
   .loading{text-align:center;padding:40px;color:var(--texto-fraco);font-size:14px}
   .spin{width:26px;height:26px;border:3px solid var(--cinza-linha);border-top-color:var(--azul);
         border-radius:50%;margin:0 auto 12px;animation:r .8s linear infinite}
   @keyframes r{to{transform:rotate(360deg)}}
-
   .note{margin-top:22px;font-size:12px;color:var(--texto-fraco);text-align:center}
   @media print{.blobs,form,.btn,.note{display:none}.card{box-shadow:none;border:0}}
 </style>
@@ -136,7 +122,6 @@
   </header>
 
   <div class="grid">
-    <!-- ENVIO -->
     <section class="card">
       <h2>Enviar redação</h2>
       <form id="form">
@@ -158,21 +143,26 @@
 
         <label for="tarefa">Tipo de tarefa</label>
         <select id="tarefa">
-          <option value="part6_email">Part 6 — E-mail (mín. 25 palavras)</option>
-          <option value="part7_story">Part 7 — Story (mín. 35 palavras)</option>
+          <option value="part6_email" data-min="25">Part 6 — E-mail (mín. 25 palavras)</option>
+          <option value="part7_story" data-min="35">Part 7 — Story (mín. 35 palavras)</option>
         </select>
 
         <label for="enunciado">Enunciado da tarefa</label>
-        <textarea id="enunciado" style="min-height:80px" placeholder="Cole aqui o enunciado que o aluno recebeu, com os três pontos a responder." required></textarea>
-
-        <label for="texto">Texto do aluno</label>
-        <textarea id="texto" placeholder="Cole o texto digitado — ou envie a foto da redação manuscrita abaixo para o OCR."></textarea>
-        <div class="hint"><span id="contador">0</span> palavras</div>
+        <textarea id="enunciado" style="min-height:80px" required
+          placeholder="Cole o enunciado que o aluno recebeu, com os três pontos a responder. Para a Part 7, descreva as três imagens em texto."></textarea>
 
         <label>Redação manuscrita (OCR)</label>
         <div class="drop" id="drop">
           Clique ou arraste uma foto/scan da redação
           <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <button class="btn btn-amarelo" type="button" id="btn-ocr" disabled>Transcrever a foto</button>
+
+        <label for="texto">Texto do aluno</label>
+        <textarea id="texto" placeholder="Cole o texto digitado — ou transcreva a foto acima."></textarea>
+        <div class="hint"><span id="contador">0</span> palavras · mínimo <span id="minimo">25</span></div>
+        <div class="hint warn" id="aviso-ocr" hidden>
+          Transcrição do OCR. <b>Confira com o aluno antes de avaliar</b> — erro de leitura não pode virar erro de escrita na nota.
         </div>
 
         <button class="btn" type="submit" id="enviar">Avaliar</button>
@@ -180,7 +170,6 @@
       </form>
     </section>
 
-    <!-- RESULTADO -->
     <section class="card" id="painel">
       <h2>Relatório</h2>
       <div class="empty" id="vazio">O relatório aparece aqui depois da avaliação.</div>
@@ -195,32 +184,31 @@
 
 <script>
 /* ───────────── Configuração ─────────────
-   Aponte para o seu backend. NUNCA coloque a chave da API aqui:
-   o front chama o backend, e o backend fala com o modelo.        */
+   Troque pelo seu Worker. A chave da API fica NO WORKER, nunca aqui. */
 const CONFIG = {
-  apiUrl: "",              // ex.: "https://api.togethere.com.br/assess"
-  logo: "assets/logo.png"  // baixe o PNG oficial do Drive (Logos/RGB/PNG)
+  apiUrl: "",              // ex.: "https://togethere-writing.SEU-SUBDOMINIO.workers.dev"
+  logo: "assets/logo.png"  // PNG oficial do Drive (NUSA › Logos › RGB › PNG)
 };
 
-const CORES = { content:"var(--azul)", organisation:"var(--amarelo)", language:"var(--rosa)" };
-const NOMES = { content:"Content", organisation:"Organisation", language:"Language" };
+const CORES = { content: "var(--azul)", organisation: "var(--amarelo)", language: "var(--rosa)" };
+const CHIP  = { DISTINCTION: "chip-dist", MERIT: "chip-merit", PASS: "chip-pass", UNSATISFACTORY: "chip-unsat" };
 
-/* Logo: usa o PNG oficial se existir, senão mantém o monograma */
-(() => {
-  const img = new Image();
-  img.onload = () => { document.getElementById("mark").innerHTML = `<img src="${CONFIG.logo}" alt="Togethere">`; };
-  img.src = CONFIG.logo;
-})();
+const $ = id => document.getElementById(id);
+const painel = $("painel");
 
-/* Contador de palavras */
-const texto = document.getElementById("texto");
-const contador = document.getElementById("contador");
-texto.addEventListener("input", () => {
-  contador.textContent = texto.value.trim() ? texto.value.trim().split(/\s+/).length : 0;
-});
+/* Logo oficial se existir; senão, monograma */
+(() => { const i = new Image();
+  i.onload = () => { $("mark").innerHTML = `<img src="${CONFIG.logo}" alt="Togethere">`; };
+  i.src = CONFIG.logo; })();
 
-/* Upload / OCR */
-const drop = document.getElementById("drop"), file = document.getElementById("file");
+/* Contador de palavras + mínimo por tarefa */
+const contar = t => t.trim() ? t.trim().split(/\s+/).length : 0;
+$("texto").addEventListener("input", () => $("contador").textContent = contar($("texto").value));
+$("tarefa").addEventListener("change", e =>
+  $("minimo").textContent = e.target.selectedOptions[0].dataset.min);
+
+/* ── Upload ── */
+const drop = $("drop"), file = $("file");
 let imagemBase64 = null;
 drop.addEventListener("click", () => file.click());
 drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
@@ -235,92 +223,115 @@ function lerImagem(f){
   const r = new FileReader();
   r.onload = () => {
     imagemBase64 = r.result;
-    drop.innerHTML = `<strong>${f.name}</strong><br><small>será transcrita por OCR no servidor</small><img src="${r.result}" alt="">`;
+    drop.innerHTML = `<strong>${f.name}</strong><img src="${r.result}" alt="">`;
+    $("btn-ocr").disabled = false;
   };
   r.readAsDataURL(f);
 }
 
-/* Envio */
-document.getElementById("form").addEventListener("submit", async e => {
-  e.preventDefault();
-  if (!texto.value.trim() && !imagemBase64) { alert("Cole o texto do aluno ou envie a foto da redação."); return; }
+/* ── Passo 1: OCR ── */
+$("btn-ocr").addEventListener("click", async () => {
+  if (!imagemBase64) return;
+  if (!CONFIG.apiUrl) return alert("Configure CONFIG.apiUrl com a URL do seu Worker.");
 
-  const payload = {
-    student:   document.getElementById("aluno").value,
-    level:     document.getElementById("nivel").value,
-    task_part: document.getElementById("tarefa").value,
-    task_prompt: document.getElementById("enunciado").value,
-    text:  texto.value.trim() || null,
-    image: imagemBase64 || null
-  };
-
-  if (!CONFIG.apiUrl) {
-    alert("Nenhum backend configurado. Defina CONFIG.apiUrl no index.html — ou use o modo demo.");
-    return;
-  }
-
-  carregando();
+  const b = $("btn-ocr");
+  b.disabled = true; b.textContent = "Transcrevendo…";
   try {
-    const r = await fetch(CONFIG.apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    const r = await fetch(CONFIG.apiUrl.replace(/\/$/, "") + "/transcribe", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imagemBase64 })
     });
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    render(await r.json());
-  } catch (err) {
-    document.getElementById("painel").innerHTML =
-      `<h2>Relatório</h2><div class="empty">Falha ao avaliar: ${err.message}</div>`;
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "HTTP " + r.status);
+
+    $("texto").value = d.text;
+    $("contador").textContent = contar(d.text);
+    $("aviso-ocr").hidden = false;
+    $("texto").focus();
+  } catch (e) {
+    alert("Falha na transcrição: " + e.message);
+  } finally {
+    b.disabled = false; b.textContent = "Transcrever a foto";
   }
 });
 
-/* Demo com um resultado de exemplo (data/sample_result.json) */
-document.getElementById("demo").addEventListener("click", async () => {
-  carregando();
+/* ── Passo 2: avaliação ── */
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const text = $("texto").value.trim();
+  if (!text) return alert("Cole o texto do aluno, ou transcreva a foto primeiro.");
+  if (!CONFIG.apiUrl) return alert("Nenhum Worker configurado. Defina CONFIG.apiUrl — ou use o modo demo.");
+
+  carregando("Avaliando contra a escala Cambridge…");
   try {
-    const r = await fetch("data/sample_result.json");
-    render(await r.json());
-  } catch {
-    document.getElementById("painel").innerHTML =
-      `<h2>Relatório</h2><div class="empty">Abra o site via servidor (ou GitHub Pages) para carregar o exemplo.</div>`;
+    const r = await fetch(CONFIG.apiUrl.replace(/\/$/, "") + "/assess", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        student:     $("aluno").value,
+        task_part:   $("tarefa").value,
+        task_prompt: $("enunciado").value,
+        text
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "HTTP " + r.status);
+    render(d);
+  } catch (err) {
+    painel.innerHTML = `<h2>Relatório</h2><div class="empty">Falha ao avaliar: ${err.message}</div>`;
   }
 });
 
-function carregando(){
-  document.getElementById("painel").innerHTML =
-    `<h2>Relatório</h2><div class="loading"><div class="spin"></div>Avaliando contra a escala Cambridge…</div>`;
-}
+/* ── Demo ── */
+$("demo").addEventListener("click", async () => {
+  carregando("Carregando exemplo…");
+  try { render(await (await fetch("data/sample_result.json")).json()); }
+  catch { painel.innerHTML = `<h2>Relatório</h2><div class="empty">Abra via servidor (ou GitHub Pages) para carregar o exemplo.</div>`; }
+});
 
+const carregando = msg =>
+  painel.innerHTML = `<h2>Relatório</h2><div class="loading"><div class="spin"></div>${msg}</div>`;
+
+/* ── Render (contrato de motor/prompt_a2.md) ── */
 function render(d){
   const barra = k => `
     <div class="bar">
-      <div class="top"><span>${NOMES[k]}</span><span><b>${d.bands[k]}</b> / 5</span></div>
-      <div class="track"><div class="fill" style="width:${d.bands[k]/5*100}%;background:${CORES[k]}"></div></div>
-      <div class="why">${d.rationale?.[k] ?? ""}</div>
+      <div class="top"><span>${k[0].toUpperCase() + k.slice(1)}</span><span><b>${d[k]?.band ?? "—"}</b> / 5</span></div>
+      <div class="track"><div class="fill" style="width:${(d[k]?.band ?? 0) / 5 * 100}%;background:${CORES[k]}"></div></div>
+      <div class="why">${d[k]?.justification ?? ""}</div>
     </div>`;
 
   const erros = (d.errors ?? []).map(e => `
-    <div class="err"><span class="tag">${e.type ?? "erro"}</span>
-      <s>${e.original}</s> → <b>${e.correction}</b>
-      ${e.note ? `<div class="why">${e.note}</div>` : ""}
+    <div class="err"><span class="tag">${e.type ?? ""}</span>
+      <s>${e.excerpt}</s> → <b>${e.correction}</b>
+      ${e.explanation ? `<div class="why">${e.explanation}</div>` : ""}
     </div>`).join("");
 
-  const sugestoes = (d.suggestions ?? []).map(s => `<li>${s}</li>`).join("");
-  const elogios   = (d.strengths ?? []).map(s => `<li>${s}</li>`).join("");
+  const li = xs => (xs ?? []).map(s => `<li>${s}</li>`).join("");
+  const palavras = d.meets_word_minimum === false
+    ? `<span style="color:var(--laranja);font-weight:500">${d.word_count} palavras — abaixo do mínimo de ${d.min_words}</span>`
+    : `${d.word_count} palavras`;
+  const revisao = d.needs_teacher_review !== false;
 
-  document.getElementById("painel").innerHTML = `
+  painel.innerHTML = `
     <h2>Relatório</h2>
     <div class="overall">
-      <b>${d.overall ?? "—"}</b>
-      <span class="chip">${d.cefr ?? ""}${d.togethere_band ? " · " + d.togethere_band : ""}</span>
+      <b>${d.overall_band ?? "—"}</b><span class="de">/ 5</span>
+      <span class="chip ${CHIP[d.togethere_band] ?? "chip-pass"}">${d.togethere_band ?? ""}</span>
+      <span class="chip chip-dist">${d.cefr_result ?? ""}</span>
     </div>
-    <div class="why" style="font-size:13px;color:var(--texto-fraco)">
-      ${d.student ? d.student + " · " : ""}${d.word_count ?? "?"} palavras
+    <div class="meta">${d.student ? d.student + " · " : ""}${palavras}</div>
+
+    ${["content", "organisation", "language"].map(barra).join("")}
+
+    ${d.summary_pt ? `<div class="sec"><h3>Para o aluno e a família</h3><div class="resumo">${d.summary_pt}</div></div>` : ""}
+    ${d.strengths?.length ? `<div class="sec"><h3>O que funcionou bem</h3><ul>${li(d.strengths)}</ul></div>` : ""}
+    ${erros ? `<div class="sec"><h3>Correções</h3>${erros}</div>` : ""}
+    ${d.next_steps?.length ? `<div class="sec"><h3>Próximos passos</h3><ul>${li(d.next_steps)}</ul></div>` : ""}
+
+    <div class="flag">
+      <span class="dot" style="background:${revisao ? "var(--laranja)" : "var(--verde)"}"></span>
+      <span>${revisao ? "Aguardando validação do professor" : "Validado"}${d.confidence ? ` · confiança <b>${d.confidence}</b>` : ""}</span>
     </div>
-    ${["content","organisation","language"].map(barra).join("")}
-    ${elogios   ? `<div class="sec"><h3>O que funcionou bem</h3><ul>${elogios}</ul></div>` : ""}
-    ${erros     ? `<div class="sec"><h3>Correções</h3>${erros}</div>` : ""}
-    ${sugestoes ? `<div class="sec"><h3>Como melhorar</h3><ul>${sugestoes}</ul></div>` : ""}
     <button class="btn btn-ghost" onclick="window.print()">Imprimir / salvar em PDF</button>`;
 }
 </script>

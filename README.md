@@ -7,31 +7,63 @@ Avaliação automática de writing para a escola Togethere. O aluno envia uma re
 ## Estrutura
 
 ```
-index.html                        Frontend (single-file, identidade visual Togethere)
-assets/brand.json                 Tokens da marca: cores, tipografia, elementos gráficos
-assets/logo.png                   ⚠️ adicionar — PNG oficial do Drive (NUSA › Logos › RGB › PNG)
+index.html                         Frontend (single-file, identidade visual Togethere)
+assets/brand.json                  Tokens da marca: cores, tipografia, elementos gráficos
+assets/logo.png                    ⚠️ adicionar — PNG oficial do Drive (NUSA › Logos › RGB › PNG)
+worker/src/index.js                API: /transcribe (OCR) e /assess (avaliação)
+worker/wrangler.toml               Config do Cloudflare Worker
 data/assessment_result.schema.json Contrato de saída do motor (JSON Schema)
-data/sample_result.json           Resultado de exemplo (alimenta o modo demo)
-motor/prompt_a2.md                System prompt do LLM avaliador (A2 Key for Schools)
-motor/gold_a2.json                Gabarito: amostras oficiais Cambridge com bandas de examinadores reais
-motor/test_concordancia.py        Mede a concordância do motor contra o gabarito
-docs/                             Arquitetura e rubrica (.docx)
-private/                          Redações de alunos e PDFs do Cambridge — NÃO versionado
+data/sample_result.json            Resultado de exemplo (alimenta o modo demo)
+motor/prompt_a2.md                 System prompt do avaliador — fonte da verdade do contrato
+motor/gold_a2.json                 Gabarito: amostras oficiais Cambridge com bandas de examinadores reais
+motor/test_concordancia.py         Mede a concordância do motor contra o gabarito
+docs/                              Arquitetura e rubrica (.docx)
+private/                           Redações de alunos e PDFs do Cambridge — NÃO versionado
 ```
 
-## Rodando o frontend
+## Como roda
 
-O `index.html` é estático — serve em GitHub Pages sem build:
+```
+navegador (GitHub Pages)  →  Cloudflare Worker  →  Claude
+   index.html                worker/src/index.js    prompt_a2.md
+```
+
+A chave da API vive **só no Worker**, como secret. O frontend nunca a vê — ele é público.
+
+### 1. Backend (Cloudflare Worker)
 
 ```bash
-python3 -m http.server 8000    # depois abra http://localhost:8000
+cd worker
+npm install
+npx wrangler secret put ANTHROPIC_API_KEY   # cola a chave; ela não vai pro git
+npx wrangler deploy
 ```
 
-Clique em **"Ver exemplo (modo demo)"** para renderizar o relatório com `data/sample_result.json`.
+Antes do deploy, ajuste `ALLOWED_ORIGINS` no `wrangler.toml` para a URL do seu Pages — sem isso, qualquer site pode chamar a sua API e gastar a sua cota.
 
-Para ligar ao backend real, edite `CONFIG.apiUrl` no topo do `<script>` em `index.html`.
+O deploy imprime a URL do Worker. Cole-a em `CONFIG.apiUrl`, no topo do `<script>` do `index.html`, e faça commit.
 
-> **Nunca coloque a chave da API no frontend.** O navegador chama o seu backend; o backend chama o modelo. Uma chave em HTML público é uma chave vazada.
+Testando direto:
+
+```bash
+curl -X POST https://SEU-WORKER.workers.dev/assess \
+  -H 'Content-Type: application/json' \
+  -d '{"task_part":"part6_email","task_prompt":"Write an email to Chris...","text":"Hello Chris! We coming to the museum."}'
+```
+
+### 2. Frontend
+
+Estático, sem build. Local:
+
+```bash
+python3 -m http.server 8000    # http://localhost:8000
+```
+
+Em produção é o próprio GitHub Pages. **"Ver exemplo (modo demo)"** renderiza o relatório a partir de `data/sample_result.json` — funciona mesmo sem Worker.
+
+### 3. Fluxo do OCR
+
+Manuscrito passa por dois passos, de propósito: **Transcrever a foto** → o professor/aluno confere o texto → **Avaliar**. O motor exige o texto confirmado, nunca o bruto do OCR, para que um erro de leitura não vire erro de escrita na nota.
 
 ## Rodando o teste de concordância
 
@@ -45,9 +77,18 @@ Saída: tabela comparando as bandas geradas com as dos examinadores Cambridge + 
 
 > **Regra:** mudou o prompt, a calibração está invalidada. Rode o teste antes de subir qualquer alteração em `motor/prompt_a2.md`.
 
-## Subescalas
+## Subescalas e bandas
 
-Content · Organisation · Language — cada uma de 0 a 5, conforme a Cambridge Writing Assessment Scale. O contrato completo do relatório está em `data/assessment_result.schema.json`.
+Content · Organisation · Language — cada uma de 0 a 5, conforme a Cambridge Writing Assessment Scale. As três são **independentes**: um aluno pode tirar 5 em Content e 2 em Language.
+
+| overall_band | Togethere | CEFR |
+|---|---|---|
+| 5 | DISTINCTION | ≥ A2 (strong) |
+| 4 | MERIT | ≥ A2 |
+| 3 | PASS | A2 achieved |
+| 0–2 | UNSATISFACTORY | below A2 |
+
+Contrato completo do relatório: `data/assessment_result.schema.json`. A fonte da verdade é a seção *Output format* do `motor/prompt_a2.md` — mudou lá, muda o schema e o `render()` do `index.html`.
 
 ## Identidade visual
 
