@@ -1,0 +1,53 @@
+{
+  "source": "Cambridge — Assessing writing for Cambridge English Qualifications: a guide for teachers, B2 First for Schools (UCLES 2024). 'Sample tasks with comments', pp. 33–43.",
+  "note": "Bandas oficiais atribuidas por examinadores Cambridge reais. Gabarito para medir concordancia do motor B2. Nao editar as bandas.",
+  "level": "b2",
+  "subscales": ["content", "communicative_achievement", "organisation", "language"],
+  "samples": [
+    {
+      "id": "B2-S1",
+      "task_part": "part1_essay",
+      "min_words": 140,
+      "max_words": 190,
+      "task_prompt": "In your English class you have been talking about learning languages. Now your English teacher has asked you to write an essay for homework. Write your essay using all the notes and giving reasons for your point of view. Essay title: 'There are more reasons to learn a foreign language than just to pass a test.' Do you agree? Notes — write about: (1) pleasure; (2) personal challenge; (3) ......... (your own idea). Write 140–190 words.",
+      "text": "\"There are more reasons to learn a foreign language than to pass a test\"\n\nEverything around us revolves around language(s), it is the most important thing in our lives. Society would just not function without it. It is our future and I would personaly love to learn as many as I possibly can.\n\nNot everything in life is done because it is necessary. Learning a new language can be a lot of fun. Many people only do it as a hoby, or their knowledge is something that brings them pride and pleasure.\n\nSecondly, we have people who do it simply to challenge themselves. Truly I believe that having a great outcome that stems from your hard work and dedication to learn something new is a wonderful way to prove your ability to yourself and others. Then there is travelling. It is very important to be able to understand and have a conversation with someone abroad, unless you would like to get lost or worse.\n\nTo conclude, I think that learning a new language is an amazing thing no matter why you do it. It is always better to do things out of enjoyment, but even if you do it for a test, that knowledge will always be useful.",
+      "gold": { "content": 5, "communicative_achievement": 5, "organisation": 4, "language": 4 }
+    },
+    {
+      "id": "B2-S2",
+      "task_part": "part1_essay",
+      "min_words": 140,
+      "max_words": 190,
+      "task_prompt": "Same essay task as B2-S1 (reasons to learn a foreign language).",
+      "text": "Learning a foreign languages is very important nowadays. English, in particular, is essential because it is spoken all over the world. That's the reason why we start studying it from the age of six years old. Going abroad and being able to speak to native people is very satisfying and that's why I want to improve my knowledge about foreign languages.\n\nI decided to take this exam to know how high my level of English is, but also because I need this certification to go abroad next summer. I really want to come back to Cornwall, an amazing region in the South-West of England. I've been there twice with my family, but now I want to go alone. Only being there to England I can really improve my English comprehension and speaking skills.\n\nFortunately I will have some English lessons which taught in English at university and I can't wait for it because it will be an interesting challenge for me.\n\nStudying foreign languages is essential to live and to travel. It isn't simple and I surely have to challenge myself everyday, but the result is so satisfying that I can't do without it.",
+      "gold": { "content": 3, "communicative_achievement": 4, "organisation": 3, "language": 4 }
+    },
+    {
+      "id": "B2-S3",
+      "task_part": "part2_story",
+      "min_words": 140,
+      "max_words": 190,
+      "task_prompt": "You have seen this announcement in an English-language magazine for teenagers: 'Stories wanted — We are looking for stories for our new English-language magazine for teenagers. Your story must begin with this sentence: When Susie's family arrived at the hotel, they were surprised to see hundreds of photographers waiting outside. Your story must include: a famous person; a request.' Write your story. 140–190 words.",
+      "text": "When Susie's family arrived at the hotel, they were surprised to see hundreds of photographers waiting outside. They had no idea what was going on. Everyone acted like crazy. It wasn't a famous hotel. The only thing less famous than the hotel itself are the clients of this hotel. So why would any photographer or journalist be interested in this place?\n\nBecause they already had a reservation, they entered the hotel. Everything seemed normal, until they went on a dinner. They hadn't had a proper meal the whole day, so a restaurant in the hotel was what they had been looking forward to.\n\nAfter they recieved their meal, their happiness disappeared. It was disgusting, the steaks they ordered were dry like a shoe. Before they managed to chew those steaks, a celebrity showed up. It was Gordon Ramsay, a famous chef. He had been shooting his series \"Hotel Hell\" here. He asked everyone to leave. Unusual request, but not from him. That was it, he closed the kitchen. Everyone knew what that meant … and regreted every bite.",
+      "gold": { "content": 5, "communicative_achievement": 4, "organisation": 3, "language": 5 }
+    },
+    {
+      "id": "B2-S4",
+      "task_part": "part2_email",
+      "min_words": 140,
+      "max_words": 190,
+      "task_prompt": "You have just received an email from your English-speaking friend, Jo: 'Hi, You know I've joined my local swimming team – well, I love it! We train every Tuesday and Thursday after school. Now my parents want me to go to an extra maths class on Tuesdays, so I won't be able to swim then. How do you think I can persuade them to change their minds? Write soon, Jo'. Write your email. 140–190 words.",
+      "text": "Hi Jo,\n\nIt is good to receive news from you! I bet you are swimming like a fish. Do you remember when we were kids and we made a few races in Angelina's pool?\n\nI understand why you are trying to persuade them but remember that they want your best. If I were you firstly I would try to talk with your swimming coach and ask him about the possibilities of training another day. Then if the answer would have been negative I will probably try to do the same with yours future math teacher. I am sure that everyone knows the importance of practising sports while studying. So they will find a solution.\n\nIf everything doesn't happen as you and I expect ensure that your parents don't get mad with your decision. They are giving their best! Put your education in first place. Opportunities to swim you will have a lot during your life. Moreover, you can come to Barcelone and try to catch me in the pool.\n\nGood luck,\nSam",
+      "gold": { "content": 5, "communicative_achievement": 4, "organisation": 3, "language": 3 }
+    },
+    {
+      "id": "B2-S5",
+      "task_part": "part2_article",
+      "min_words": 140,
+      "max_words": 190,
+      "task_prompt": "You see this notice in your school magazine: 'Articles wanted — How to have fun without spending too much money. Life can be expensive – especially for teenagers! Tell us how you and your friends have fun without spending a lot of money. The best article will be published in next month's magazine.' Write your article. 140–190 words.",
+      "text": "By watch a nature and birds are the best to take pleasure there is different feeling to have fun in nature. Nature make us happy and relive stressful. I think to Have fun it would be bether to stay with nature because it is the best place to have fun. So, It would be better to have fun in Nature with friends.\n\nWe went this last Saturday to Chiseni for traking and which we was climbing that we saw many trees and fruits we also saw water fall and river we play there and on the grass on the top of hill there was picnic spot where many people was doing picnic there. We also joint them as they invited to join them we had a lot of fun there by dancing sing and By having delicious food so, I suggest you to go such place where we can have a lot of fun and less money can be spend.",
+      "gold": { "content": 5, "communicative_achievement": 4, "organisation": 2, "language": 2 }
+    }
+  ]
+}

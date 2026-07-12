@@ -1,0 +1,56 @@
+{
+  "source": "Cambridge — Assessing writing for Cambridge English Qualifications: a guide for teachers, B1 Preliminary for Schools (UCLES 2024). 'Sample tasks with comments', pp. 34–47.",
+  "note": "Bandas oficiais atribuidas por examinadores Cambridge reais. Gabarito para medir concordancia do motor B1. Nao editar as bandas.",
+  "level": "b1",
+  "subscales": ["content", "communicative_achievement", "organisation", "language"],
+  "samples": [
+    {
+      "id": "B1-S1",
+      "task_part": "part1_email",
+      "min_words": 100,
+      "task_prompt": "Read this email from your English teacher, Mrs Rose, and the notes you have made. EMAIL from Mrs Rose, subject 'New film club': 'I'd like to start an after-school Film Club. We can meet either on Monday or Friday afternoon. Which one would you prefer? Which types of film would you like to see? I want to provide some food and drink during the films. Is this a good idea? Please let me know what you think. Many thanks!' Notes: (1) That's great; (2) Explain which; (3) Explain; (4) Give your opinion. Write your email to Mrs Rose using all the notes. About 100 words.",
+      "text": "Good afternoon Mrs Rose\nI just got your email and I think it's really great idea becase I think lots of people like watching films.\nI personally would prefer Mondays because on Fridays I often have other plans with my family\nI would really love to see some detective or some action films but I relly do't mind watching something different.\nI think it's good idea to have some food or drink during the film because lots of people are used to it because in cinemas they always eat something so i think it would be great\nHave a nice day",
+      "gold": { "content": 5, "communicative_achievement": 5, "organisation": 4, "language": 4 }
+    },
+    {
+      "id": "B1-S2",
+      "task_part": "part1_email",
+      "min_words": 100,
+      "task_prompt": "Same email task as B1-S1 (Mrs Rose, new film club).",
+      "text": "Hey! Thats great!\nI'm doesn't prefer Monday afternoon is doesn't possible to me, because I have tennis classes after school, and next. I am going with Laura houses, and Friday is perfect. For me, I don't have nothing, do you like this day?\nMy favorite types of the films is comedi and romantic film, and in the film club was another, and you like, we can see, I don't have any prolem to the film.\nYes, is a very good idea, I am buying some pop corn and a botle water or and sweets I don't know, were you buy in\nKises\nWRite me soon and see you soon\nClara!",
+      "gold": { "content": 5, "communicative_achievement": 2, "organisation": 2, "language": 1 }
+    },
+    {
+      "id": "B1-S3",
+      "task_part": "part1_email",
+      "min_words": 100,
+      "task_prompt": "Same email task as B1-S1 (Mrs Rose, new film club).",
+      "text": "Hello Mrs Rose\nOh, new film club is great idea. It sounds really grait.\nI prefer Friday, because it should be a nice end of the week to watch some films on Monday, you have to prepare for the school and watching films, it is for me wasting of time when the school week is starting. I really like sci-fi, but I don't mind any different types of films. I will let it up to you which film will you bring. I don't think so, that is a good idea, because after we'll end we must clear a class and I think it can take so much time.\nSo these are my ansers\nSee you soon RICHARD",
+      "gold": { "content": 5, "communicative_achievement": 3, "organisation": 3, "language": 3 }
+    },
+    {
+      "id": "B1-S4",
+      "task_part": "part2_article",
+      "min_words": 100,
+      "task_prompt": "You see this announcement in your school English-language magazine: 'Articles wanted! WHAT MAKES YOU LAUGH? Write an article telling us what you find funny and who you enjoy laughing with. Do you think it's good to laugh a lot? Why? The best articles answering these questions will be published next month.' Write your article. About 100 words.",
+      "text": "What makes me laugh? Pretty much everthing. I can start laughing simply from watching my cat trying to catch a laser dot on the wall, or a fly. And I laugh even more with my friends and family. It is practically the only way we are spending with ourselves. We are making jokes, laughing at something or telling funny stories about our trips, days at school or our pets.\nI think it is important to laugh a lot, because it makes everyday stress easier to handle or it simply wears off! And it makes you look happy, optimistic and ready for a challenge.",
+      "gold": { "content": 5, "communicative_achievement": 5, "organisation": 4, "language": 4 }
+    },
+    {
+      "id": "B1-S5",
+      "task_part": "part2_article",
+      "min_words": 100,
+      "task_prompt": "Same article task as B1-S4 (What makes you laugh?).",
+      "text": "I have got many friends who can make me laugh. I am a big optimist, so I love laugh. I laugh every time when I am at school, at home, in the park, simply everywhere. My dad always makes my laugh, because he is very funny adnd his funny stories are the best of the best. If I am alone, I usually watch comedies. But the best comedy serial The Simpsons. The yellow family is the funniest family which I know. My favourite type of joke is black joke.It is bad, but funny. When I am surfing on the Internet I'm always searching videos called \"Try not to laugh\". I can't accept it because it is too funny.",
+      "gold": { "content": 3, "communicative_achievement": 3, "organisation": 3, "language": 4 }
+    },
+    {
+      "id": "B1-S6",
+      "task_part": "part2_story",
+      "min_words": 100,
+      "task_prompt": "Your English teacher has asked you to write a story. Your story must begin with this sentence: 'I couldn't believe what I saw when I walked into the classroom.' Write your story. About 100 words.",
+      "text": "The teacher couldn't believe what she saw when she opened the door of the class room! There was a Runway, with models, bloggers and every person fashionist in the world. The teacher at the beggining was mad, but later she started so happy and she fun, like everyone. The runway and party later have a lot of entertainment, good music, the food was very delicious. I was fun so much, I meet amaizing people, I dance. It was an incredible day, but I have my punishment with the teacher to the end.",
+      "gold": { "content": 5, "communicative_achievement": 3, "organisation": 3, "language": 3 }
+    }
+  ]
+}
