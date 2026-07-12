@@ -154,7 +154,8 @@
         <label>Redação manuscrita (OCR)</label>
         <div class="drop" id="drop">
           Clique ou arraste uma foto/scan da redação
-          <input type="file" id="file" accept="image/*" hidden>
+          <small style="display:block;margin-top:4px;opacity:.75">JPEG, PNG, WEBP ou HEIC (foto de iPhone)</small>
+          <input type="file" id="file" accept="image/*,.heic,.heif" hidden>
         </div>
         <button class="btn btn-amarelo" type="button" id="btn-ocr" disabled>Transcrever a foto</button>
 
@@ -219,14 +220,72 @@ drop.addEventListener("drop", e => {
 });
 file.addEventListener("change", () => file.files[0] && lerImagem(file.files[0]));
 
-function lerImagem(f){
-  const r = new FileReader();
-  r.onload = () => {
-    imagemBase64 = r.result;
-    drop.innerHTML = `<strong>${f.name}</strong><img src="${r.result}" alt="">`;
-    $("btn-ocr").disabled = false;
-  };
-  r.readAsDataURL(f);
+/* Foto de iPhone chega em HEIC, que nem o Chrome decodifica nem a API aceita
+   (só jpeg/png/gif/webp). E foto de celular passa fácil dos 5 MB por imagem
+   que a API permite. Então: converte para JPEG e reduz antes de enviar. */
+const MAX_LADO = 2000;   // px — mais que isso não melhora a leitura da letra
+const QUALIDADE = 0.85;
+
+async function lerImagem(f){
+  const btn = $("btn-ocr");
+  drop.innerHTML = `<strong>${f.name}</strong><br><small>preparando imagem…</small>`;
+  btn.disabled = true;
+
+  try {
+    let blob = f;
+
+    if (/heic|heif/i.test(f.type) || /\.hei[cf]$/i.test(f.name)) {
+      drop.innerHTML = `<strong>${f.name}</strong><br><small>convertendo HEIC…</small>`;
+      blob = await heicParaJpeg(f);
+    }
+
+    imagemBase64 = await reduzirParaJpeg(blob);
+    const kb = Math.round(imagemBase64.length * 0.75 / 1024);
+    drop.innerHTML = `<strong>${f.name}</strong><br><small>pronta · ${kb} KB</small><img src="${imagemBase64}" alt="">`;
+    btn.disabled = false;
+  } catch (e) {
+    imagemBase64 = null;
+    drop.innerHTML = `<strong>Não consegui ler ${f.name}</strong><br><small>${e.message}<br>Tente JPEG ou PNG.</small>`;
+  }
+}
+
+/* Nenhum navegador além do Safari decodifica HEIC; carregamos o heic2any só quando precisa. */
+async function heicParaJpeg(f){
+  if (!window.heic2any) {
+    await new Promise((ok, erro) => {
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js";
+      s.onload = ok;
+      s.onerror = () => erro(new Error("Falha ao carregar o conversor de HEIC."));
+      document.head.appendChild(s);
+    });
+  }
+  return window.heic2any({ blob: f, toType: "image/jpeg", quality: QUALIDADE });
+}
+
+/* Redimensiona e reencoda em JPEG — resolve tamanho e formato de uma vez. */
+function reduzirParaJpeg(blob){
+  return new Promise((ok, erro) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const escala = Math.min(1, MAX_LADO / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width  = Math.round(img.width  * escala);
+      c.height = Math.round(img.height * escala);
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";               // JPEG não tem transparência
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      ok(c.toDataURL("image/jpeg", QUALIDADE));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      erro(new Error("Formato de imagem não suportado pelo navegador."));
+    };
+    img.src = url;
+  });
 }
 
 /* ── Passo 1: OCR ── */

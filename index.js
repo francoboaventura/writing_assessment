@@ -16,6 +16,7 @@ const MODEL = "claude-sonnet-5";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const MIN_WORDS = { part6_email: 25, part7_story: 35 };
+const FORMATOS = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export default {
   async fetch(request, env) {
@@ -42,9 +43,23 @@ export default {
 async function transcribe({ image }, env) {
   if (!image) throw bad("Envie a imagem da redação em 'image' (data URL).");
 
-  const m = /^data:(image\/[a-z+]+);base64,(.+)$/is.exec(image.trim());
+  const m = /^data:(image\/[a-z+.-]+);base64,(.+)$/is.exec(image.trim());
   if (!m) throw bad("Formato de imagem inválido. Esperado data URL base64.");
   const [, media_type, data] = m;
+
+  // A API aceita só estes quatro. HEIC (foto de iPhone) é convertido para JPEG
+  // no navegador antes de chegar aqui — ver reduzirParaJpeg() no index.html.
+  if (!FORMATOS.includes(media_type.toLowerCase())) {
+    throw bad(
+      media_type.includes("hei")
+        ? "HEIC não é aceito pela API. Converta para JPEG antes de enviar."
+        : `Formato ${media_type} não suportado. Use JPEG, PNG, GIF ou WEBP.`
+    );
+  }
+
+  // Limite de 5 MB por imagem; base64 infla ~33%.
+  if (data.length * 0.75 > 5 * 1024 * 1024)
+    throw bad("Imagem acima de 5 MB. Reduza a foto antes de enviar.", 413);
 
   const out = await claude(env, {
     max_tokens: 2000,
