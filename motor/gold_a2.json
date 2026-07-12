@@ -1,0 +1,46 @@
+{
+  "source": "Cambridge Assessing Writing Guide — A2 Key for Schools (UCLES 2020), 'Sample tasks with examiner comments'",
+  "note": "Bandas oficiais atribuidas por examinadores Cambridge reais. Gabarito para medir concordancia do motor.",
+  "samples": [
+    {
+      "id": "A2-S1",
+      "task_part": "part6_email",
+      "min_words": 25,
+      "task_prompt": "Your English friend Chris is coming with you and your family to the local museum next Saturday. Write an email to Chris. Tell Chris: (1) how you will travel to the museum; (2) what he can see at the museum; (3) what he needs to bring. Write 25 words or more.",
+      "text": "Hello Chris! Next Saturday we coming to the local museum. Your must bring: bootle of water, some food, and 5 Euro. We can see many super since. We travel at museum on bus. Goodbye!",
+      "gold": { "content": 4, "organisation": 3, "language": 3 }
+    },
+    {
+      "id": "A2-S2",
+      "task_part": "part6_email",
+      "min_words": 25,
+      "task_prompt": "You would like to go to the park tomorrow. Write an email to your English friend Sammy. In your email: (1) ask Sammy to come to the park with you; (2) explain how you can both get there; (3) say what you can do there. Write 25 words or more.",
+      "text": "I GOING TO THE PARK BEACAUSE IT IS VERY BEATIFUL. I GET THERE BEACAUSE THEY'RE PLAY FOOTBALL, PLAY A KITE. I SEE THE BIRTH. IT'S RUNING. I CAN BY BUS. IT'S VERY CHEAP BUT I CAN A TAXI IT'S VERY EXPENSIVE",
+      "gold": { "content": 2, "organisation": 2, "language": 2 }
+    },
+    {
+      "id": "A2-S3",
+      "task_part": "part7_story",
+      "min_words": 35,
+      "task_prompt": "Look at the three pictures. Write the story shown in the pictures. The pictures show: (1) a group of friends packing food into a bag for a picnic; (2) the friends eating the food at a picnic by a lake; (3) two of the friends swimming in the lake while the others watch. Write 35 words or more.",
+      "text": "Last Saturday I went to a picnic with my friends. First, we put the fruits, sandwitch and orange juice in my bag, then we went. When we arrived at the camping, we ate on the floor. Then Tom and Lucy went to the lake and Michel and me saw them.",
+      "gold": { "content": 5, "organisation": 5, "language": 5 }
+    },
+    {
+      "id": "A2-S4",
+      "task_part": "part7_story",
+      "min_words": 35,
+      "task_prompt": "Look at the three pictures. Write the story shown in the pictures. The pictures show: (1) a group of friends packing food into a bag for a picnic; (2) the friends eating the food at a picnic by a lake; (3) two of the friends swimming in the lake while the others watch. Write 35 words or more.",
+      "text": "Mum, Katy, dad and Jim are preparing their bag for picnic on the picnic they have a lot of food when when they ate the food. Jim and Katy go swiming and they have a lot of fun.",
+      "gold": { "content": 5, "organisation": 2, "language": 3 }
+    },
+    {
+      "id": "A2-S5",
+      "task_part": "part7_story",
+      "min_words": 35,
+      "task_prompt": "Look at the three pictures. Write the story shown in the pictures. The pictures show: (1) a group of friends packing food into a bag for a picnic; (2) the friends eating the food at a picnic by a lake; (3) two of the friends swimming in the lake while the others watch. Write 35 words or more.",
+      "text": "Nati was a girl of eighteen years, and she leav, in London with her grandmother because there is a good education, but today she will come to visit us in Paris, we want to take her to a picnic, I think is going to be very fun!",
+      "gold": { "content": 1, "organisation": 3, "language": 4 }
+    }
+  ]
+}

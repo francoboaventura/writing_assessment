@@ -1,0 +1,38 @@
+{
+  "brand": "Togethere",
+  "tagline": "inglês para chegar lá",
+  "source": "Togethere — Manual da Identidade Visual (Nusa Brands, 2021). Google Drive: NUSA - ID Visual",
+  "values": ["Moderna", "Referência em qualidade", "Gregária"],
+  "colors": {
+    "principais": {
+      "azul":     { "hex": "#005EAF", "rgb": [0, 94, 175],   "cmyk": [91, 61, 0, 0] },
+      "vermelho": { "hex": "#E52524", "rgb": [229, 37, 36],  "cmyk": [0, 91, 82, 0] },
+      "amarelo":  { "hex": "#FFC800", "rgb": [255, 200, 0],  "cmyk": [0, 23, 93, 0] }
+    },
+    "apoio": {
+      "rosa":        { "hex": "#FF005F", "rgb": [255, 0, 95],    "cmyk": [0, 95, 35, 0] },
+      "laranja":     { "hex": "#FF2A00", "rgb": [255, 42, 0],    "cmyk": [0, 89, 93, 0] },
+      "azul_escuro": { "hex": "#002B64", "rgb": [0, 43, 100],    "cmyk": [100, 88, 35, 22] },
+      "roxo":        { "hex": "#DF6DFF", "rgb": [223, 109, 255], "cmyk": [29, 60, 0, 0] }
+    },
+    "uso": "RGB/HEX para telas (web, vídeo). CMYK apenas para impressão."
+  },
+  "typography": {
+    "titulos": { "family": "Zilla Slab", "style": "SemiBold Italic", "weight": 600 },
+    "textos":  { "family": "Urbanist",   "style": "Light / Light Italic", "weight": 300 },
+    "google_fonts": "https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@1,600&family=Urbanist:ital,wght@0,300;0,500;0,700;1,300&display=swap"
+  },
+  "elementos_graficos": {
+    "esferas": "Círculos preenchidos, usados em sobreposição para compor o layout. Qualquer cor da paleta.",
+    "feijoes": "Formas orgânicas, preenchidas ou em linha. Como background: baixa saturação e baixo contraste."
+  },
+  "logo": {
+    "versoes": ["Vertical (preferencial)", "Horizontal", "Secundária 1", "Secundária 2"],
+    "regras": [
+      "Nunca alterar cores, tipografia, proporções ou espaçamento do logo.",
+      "Respeitar a área de proteção (medida X = o símbolo).",
+      "Aplicar sobre branco ou sobre as cores institucionais; usar box quando o fundo prejudicar a leitura."
+    ],
+    "arquivo_esperado": "assets/logo.png (baixar do Drive: NUSA - ID Visual › Togethere Inglês › Logos › RGB › PNG)"
+  }
+}

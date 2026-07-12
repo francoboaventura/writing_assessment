@@ -1,0 +1,14 @@
+{
+  "name": "togethere-writing-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API de avaliação de writing — Cloudflare Worker",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "secret": "wrangler secret put ANTHROPIC_API_KEY"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

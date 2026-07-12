@@ -1,0 +1,105 @@
+{
+  "note": "Fonte única de verdade dos níveis e tipos de tarefa. O frontend monta os seletores daqui; o Worker escolhe o prompt daqui. Não duplicar estas listas em outro lugar.",
+  "subscale_labels": {
+    "content": "Content",
+    "communicative_achievement": "Communicative Achievement",
+    "organisation": "Organisation",
+    "language": "Language"
+  },
+  "levels": [
+    {
+      "id": "a1",
+      "label": "A1",
+      "exam": null,
+      "enabled": false,
+      "calibrated": false,
+      "status": "Sem escala oficial. O Cambridge não publica uma Writing Assessment Scale para A1 — Pre A1 Starters e A1 Movers não avaliam writing por bandas. Para textos de alunos A1, use o nível A2 com o tipo 'Texto livre' e leia o resultado como diagnóstico, não como nota.",
+      "subscales": [],
+      "tasks": []
+    },
+    {
+      "id": "a2",
+      "label": "A2 Key for Schools",
+      "exam": "A2 Key for Schools",
+      "enabled": true,
+      "calibrated": true,
+      "prompt": "motor/prompt_a2.md",
+      "gold": "motor/gold_a2.json",
+      "subscales": ["content", "organisation", "language"],
+      "tasks": [
+        { "id": "part6_email", "label": "Part 6 — E-mail", "min_words": 25 },
+        { "id": "part7_story", "label": "Part 7 — Story", "min_words": 35 },
+        { "id": "free_text",   "label": "Texto livre (fora do exame)", "min_words": 25, "free": true }
+      ]
+    },
+    {
+      "id": "b1",
+      "label": "B1 Preliminary for Schools",
+      "exam": "B1 Preliminary for Schools",
+      "enabled": true,
+      "calibrated": true,
+      "prompt": "motor/prompt_b1.md",
+      "gold": "motor/gold_b1.json",
+      "subscales": ["content", "communicative_achievement", "organisation", "language"],
+      "tasks": [
+        { "id": "part1_email",   "label": "Part 1 — E-mail (com as 4 notas)", "min_words": 100 },
+        { "id": "part2_article", "label": "Part 2 — Article", "min_words": 100 },
+        { "id": "part2_story",   "label": "Part 2 — Story", "min_words": 100 },
+        { "id": "free_text",     "label": "Texto livre (fora do exame)", "min_words": 100, "free": true }
+      ]
+    },
+    {
+      "id": "b2",
+      "label": "B2 First for Schools",
+      "exam": "B2 First for Schools",
+      "enabled": true,
+      "calibrated": true,
+      "prompt": "motor/prompt_b2.md",
+      "gold": "motor/gold_b2.json",
+      "subscales": ["content", "communicative_achievement", "organisation", "language"],
+      "tasks": [
+        { "id": "part1_essay",   "label": "Part 1 — Essay (obrigatória)", "min_words": 140, "max_words": 190 },
+        { "id": "part2_article", "label": "Part 2 — Article", "min_words": 140, "max_words": 190 },
+        { "id": "part2_email",   "label": "Part 2 — E-mail / Letter", "min_words": 140, "max_words": 190 },
+        { "id": "part2_review",  "label": "Part 2 — Review", "min_words": 140, "max_words": 190 },
+        { "id": "part2_story",   "label": "Part 2 — Story", "min_words": 140, "max_words": 190 },
+        { "id": "free_text",     "label": "Texto livre (fora do exame)", "min_words": 140, "free": true }
+      ]
+    },
+    {
+      "id": "c1",
+      "label": "C1 Advanced",
+      "exam": "C1 Advanced",
+      "enabled": true,
+      "calibrated": true,
+      "prompt": "motor/prompt_c1.md",
+      "gold": "motor/gold_c1.json",
+      "subscales": ["content", "communicative_achievement", "organisation", "language"],
+      "tasks": [
+        { "id": "part1_essay",    "label": "Part 1 — Essay (obrigatória)", "min_words": 220, "max_words": 260 },
+        { "id": "part2_letter",   "label": "Part 2 — Letter / E-mail", "min_words": 220, "max_words": 260 },
+        { "id": "part2_proposal", "label": "Part 2 — Proposal", "min_words": 220, "max_words": 260 },
+        { "id": "part2_report",   "label": "Part 2 — Report", "min_words": 220, "max_words": 260 },
+        { "id": "part2_review",   "label": "Part 2 — Review", "min_words": 220, "max_words": 260 },
+        { "id": "free_text",      "label": "Texto livre (fora do exame)", "min_words": 220, "free": true }
+      ]
+    },
+    {
+      "id": "c2",
+      "label": "C2 Proficiency",
+      "exam": "C2 Proficiency",
+      "enabled": false,
+      "calibrated": false,
+      "status": "Motor ainda não construído. O guia oficial (C2 Assessing Writing Guide) está no Drive da escola — a escala e as amostras com bandas de examinador ainda precisam ser extraídas, como foi feito para A2, B1, B2 e C1.",
+      "subscales": ["content", "communicative_achievement", "organisation", "language"],
+      "tasks": [
+        { "id": "part1_essay",    "label": "Part 1 — Essay (obrigatória)", "min_words": 240, "max_words": 280 },
+        { "id": "part2_article",  "label": "Part 2 — Article", "min_words": 280, "max_words": 320 },
+        { "id": "part2_letter",   "label": "Part 2 — Letter", "min_words": 280, "max_words": 320 },
+        { "id": "part2_report",   "label": "Part 2 — Report", "min_words": 280, "max_words": 320 },
+        { "id": "part2_review",   "label": "Part 2 — Review", "min_words": 280, "max_words": 320 },
+        { "id": "free_text",      "label": "Texto livre (fora do exame)", "min_words": 240, "free": true }
+      ]
+    }
+  ]
+}

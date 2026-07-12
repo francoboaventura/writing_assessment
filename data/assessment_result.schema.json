@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://togethere.com.br/schemas/assessment_result.json",
+  "title": "Writing Assessment Result",
+  "description": "Contrato de saída dos motores (A2, B1, B2, C1). A fonte da verdade é a seção 'Output format' de cada motor/prompt_*.md — este schema apenas o formaliza. Mudou lá, muda aqui. O A2 usa 3 subescalas; do B1 para cima, 4 (entra Communicative Achievement).",
+  "type": "object",
+  "required": ["level", "task_part", "content", "organisation", "language", "overall_band", "togethere_band", "cefr_result"],
+  "properties": {
+    "student":            { "type": "string" },
+    "level":              { "type": "string", "enum": ["a2", "b1", "b2", "c1", "c2"] },
+    "task_part":          { "type": "string", "description": "id da tarefa, conforme data/levels.json. 'free_text' é o coringa: texto fora do formato do exame." },
+    "subscales":          { "type": "array", "items": { "type": "string", "enum": ["content", "communicative_achievement", "organisation", "language"] }, "description": "Quais subescalas valem neste nível. O frontend renderiza a partir desta lista." },
+    "word_count":         { "type": "integer", "minimum": 0 },
+    "min_words":          { "type": "integer", "minimum": 0 },
+    "max_words":          { "type": "integer", "minimum": 0 },
+    "meets_word_minimum": { "type": "boolean" },
+
+    "content":                   { "$ref": "#/$defs/subscale" },
+    "communicative_achievement": { "$ref": "#/$defs/subscale", "description": "Ausente no A2 Key, que usa apenas três subescalas." },
+    "organisation":              { "$ref": "#/$defs/subscale" },
+    "language":                  { "$ref": "#/$defs/subscale" },
+
+    "overall_band":   { "type": "integer", "minimum": 0, "maximum": 5, "description": "Média das subescalas do nível, arredondada (0,5 sobe). Recalculada no Worker — não confiamos na aritmética do modelo." },
+    "togethere_band": { "type": "string", "enum": ["DISTINCTION", "MERIT", "PASS", "UNSATISFACTORY"] },
+    "cefr_result":    { "type": "string", "description": "'<nível> achieved' ou 'below <nível>'. Banda 3+ significa que o aluno está no nível." },
+
+    "errors": {
+      "type": "array",
+      "maxItems": 8,
+      "description": "Só os erros que importam, priorizando os que impedem o sentido.",
+      "items": {
+        "type": "object",
+        "required": ["excerpt", "type", "correction", "explanation"],
+        "properties": {
+          "excerpt":     { "type": "string", "description": "As palavras exatas do aluno." },
+          "type":        { "type": "string", "enum": ["grammar", "vocabulary", "spelling", "punctuation", "cohesion", "register", "format"] },
+          "correction":  { "type": "string" },
+          "explanation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "strengths":  { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "string" }, "description": "Concreto, citando as palavras do aluno. Nunca genérico." },
+    "next_steps": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string" }, "description": "Foco, não dispersão. Acionável." },
+    "summary_pt": { "type": "string", "description": "2–3 frases em português, para o aluno e a família. Alimenta o Sponte." },
+
+    "confidence":           { "type": "string", "enum": ["high", "medium", "low"] },
+    "needs_teacher_review": { "type": "boolean", "description": "Sempre true durante o piloto." },
+    "calibrated":           { "type": "boolean", "description": "false = o motor deste nível ainda não foi medido contra gabarito de examinador. A nota é indicativa." },
+
+    "assessed_at":    { "type": "string", "format": "date-time" },
+    "engine_version": { "type": "string" }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "subscale": {
+      "type": "object",
+      "required": ["band", "justification"],
+      "properties": {
+        "band":          { "type": "integer", "minimum": 0, "maximum": 5 },
+        "justification": { "type": "string", "description": "Cita as palavras do aluno como evidência, como faz o comentário do examinador Cambridge." }
+      },
+      "additionalProperties": false
+    }
+  }
+}

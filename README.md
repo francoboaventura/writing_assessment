@@ -2,7 +2,24 @@
 
 Avaliação automática de writing para a escola Togethere. O aluno envia uma redação (manuscrita ou digitada), o sistema lê via OCR, avalia contra a **Cambridge Writing Assessment Scale** e devolve um relatório com bandas, correções e sugestões — mapeado para os níveis internos da escola (A1–C2).
 
-**Estado:** v0.1 — motor calibrado para **A2 Key for Schools** (Part 6 e-mail, Part 7 story). B1/B2/C1 em desenvolvimento.
+**Estado:** v0.1 — quatro motores calibrados: **A2 Key for Schools**, **B1 Preliminary for Schools**, **B2 First for Schools** e **C1 Advanced**. C2 pendente; A1 não se aplica (ver abaixo).
+
+## Níveis
+
+| Nível | Exame | Subescalas | Tarefas | Gabarito |
+|---|---|---|---|---|
+| A1 | — | — | — | Não existe Writing Assessment Scale oficial para A1. Use A2 + "Texto livre" como diagnóstico. |
+| A2 | A2 Key for Schools | 3 | e-mail, story | 5 amostras |
+| B1 | B1 Preliminary for Schools | 4 | e-mail, article, story | 6 amostras |
+| B2 | B2 First for Schools | 4 | essay, article, e-mail, review, story | 5 amostras |
+| C1 | C1 Advanced | 4 | essay, letter, proposal, report, review | 7 amostras |
+| C2 | C2 Proficiency | 4 | — | Motor não construído (guia está no Drive) |
+
+O A2 Key usa **três** subescalas (Content · Organisation · Language). Do B1 para cima entra a quarta, **Communicative Achievement** — quão bem o texto comunica ao leitor pretendido, coisa distinta de estar gramaticalmente correto.
+
+Todo nível ativo tem também o tipo **Texto livre**: um coringa para textos fora do formato do exame (diário, cartaz, projeto, exercício do material). O motor aplica a régua do nível, julgando Communicative Achievement contra o gênero que o enunciado descrever — por isso, no texto livre, um enunciado bem escrito é o que sustenta a nota.
+
+Os gabaritos (`motor/gold_*.json`) são amostras reais de candidatos com as bandas que **examinadores Cambridge de verdade** deram, extraídas dos *Assessing Writing Guides* oficiais. São a única prova de que o motor concorda com um humano treinado. Não edite as bandas.
 
 ## Estrutura
 
@@ -70,12 +87,25 @@ Manuscrito passa por dois passos, de propósito: **Transcrever a foto** → o pr
 ```bash
 pip install anthropic
 export ANTHROPIC_API_KEY=sk-...
-python motor/test_concordancia.py
+python motor/test_concordancia.py c1       # ou a2, b1, b2
+python motor/test_concordancia.py todos
 ```
 
-Saída: tabela comparando as bandas geradas com as dos examinadores Cambridge + concordância exata e ±1 banda.
+Saída: tabela comparando as bandas geradas com as dos examinadores Cambridge + concordância exata e ±1 banda. Referência: examinadores humanos treinados concordam exatamente em ~60–70% das vezes e quase sempre ficam dentro de ±1 banda.
 
-> **Regra:** mudou o prompt, a calibração está invalidada. Rode o teste antes de subir qualquer alteração em `motor/prompt_a2.md`.
+> **Regra:** mudou o prompt, a calibração está invalidada. Rode o teste antes de subir qualquer alteração em `motor/prompt_*.md`.
+
+O teste e o Worker extraem **o mesmo bloco** `## SYSTEM PROMPT` do `.md` — o resto do arquivo é documentação e não vai para o modelo. Se essas duas extrações divergirem, o prompt medido deixa de ser o prompt que roda em produção e o teste passa a mentir.
+
+## Acrescentando um nível
+
+1. `motor/prompt_<nivel>.md` — a escala oficial daquele exame, no formato dos outros.
+2. `motor/gold_<nivel>.json` — amostras do *Assessing Writing Guide* com as bandas dos examinadores.
+3. `data/levels.json` — tarefas, mínimos de palavras, subescalas, `enabled: true`.
+4. `worker/src/index.js` — importar o prompt e registrar em `PROMPTS`.
+5. Rodar o teste de concordância. Só então mostrar a nota a um professor.
+
+Frontend não precisa de mudança: os seletores e as barras se montam a partir de `data/levels.json` e das subescalas que vierem no resultado.
 
 ## Subescalas e bandas
 
