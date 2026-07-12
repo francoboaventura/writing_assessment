@@ -33,8 +33,12 @@ except ImportError:
 
 HERE = Path(__file__).parent
 MODEL = "claude-sonnet-5"
-TEMPERATURE = 0.0
 NIVEIS = ["a2", "b1", "b2", "c1"]
+
+# Sem `temperature`: o modelo atual nao aceita mais o parametro. Sem ele nao ha
+# determinismo garantido — rodar duas vezes pode dar bandas ligeiramente
+# diferentes. Se a concordancia oscilar muito entre execucoes, isso e um achado:
+# significa que o prompt esta deixando margem demais e precisa ser mais explicito.
 
 
 def system_prompt(nivel: str) -> str:
@@ -45,13 +49,62 @@ def system_prompt(nivel: str) -> str:
     return md[inicio:fim].strip()
 
 
-def avaliar(client, prompt, amostra):
+def ferramenta(subs):
+    """Mesmo esquema do Worker (worker/src/index.js, ferramenta()).
+
+    Se os dois divergirem, o teste mede um sistema e a producao roda outro.
+    """
+    subescala = {
+        "type": "object",
+        "properties": {
+            "band": {"type": "integer", "minimum": 0, "maximum": 5},
+            "justification": {"type": "string"},
+        },
+        "required": ["band", "justification"],
+    }
+    props = {s: subescala for s in subs}
+    props.update({
+        "overall_band": {"type": "integer", "minimum": 0, "maximum": 5},
+        "togethere_band": {"type": "string",
+                           "enum": ["DISTINCTION", "MERIT", "PASS", "UNSATISFACTORY"]},
+        "cefr_result": {"type": "string"},
+        "errors": {"type": "array", "maxItems": 8, "items": {
+            "type": "object",
+            "properties": {
+                "excerpt": {"type": "string"},
+                "type": {"type": "string",
+                         "enum": ["grammar", "vocabulary", "spelling", "punctuation",
+                                  "cohesion", "register", "format"]},
+                "correction": {"type": "string"},
+                "explanation": {"type": "string"},
+            },
+            "required": ["excerpt", "type", "correction", "explanation"],
+        }},
+        "strengths": {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "string"}},
+        "next_steps": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string"}},
+        "summary_pt": {"type": "string"},
+        "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+    })
+    return {
+        "name": "submit_assessment",
+        "description": "Entrega a avaliacao da redacao conforme a Cambridge Writing Assessment Scale.",
+        "input_schema": {
+            "type": "object",
+            "properties": props,
+            "required": list(subs) + ["overall_band", "togethere_band", "cefr_result",
+                                      "strengths", "next_steps", "summary_pt", "confidence"],
+        },
+    }
+
+
+def avaliar(client, prompt, amostra, subs):
     """Manda uma amostra ao motor e devolve as bandas por subescala."""
     msg = client.messages.create(
         model=MODEL,
-        max_tokens=3000,
-        temperature=TEMPERATURE,
+        max_tokens=8000,
         system=prompt,
+        tools=[ferramenta(subs)],
+        tool_choice={"type": "tool", "name": "submit_assessment"},
         messages=[{
             "role": "user",
             "content": (
@@ -61,10 +114,13 @@ def avaliar(client, prompt, amostra):
             ),
         }],
     )
-    bruto = "".join(b.text for b in msg.content if b.type == "text").strip()
-    bruto = re.sub(r"^```(?:json)?\s*|\s*```$", "", bruto)
-    dados = json.loads(bruto[bruto.index("{"): bruto.rindex("}") + 1])
-    return {sub: dados[sub]["band"] for sub in amostra["gold"]}
+    if msg.stop_reason == "max_tokens":
+        raise RuntimeError("resposta cortada por max_tokens")
+
+    uso = next((b for b in msg.content if b.type == "tool_use"), None)
+    if uso is None:
+        raise RuntimeError("o modelo nao preencheu a avaliacao")
+    return {sub: uso.input[sub]["band"] for sub in amostra["gold"]}
 
 
 def rodar(nivel, client):
@@ -80,7 +136,7 @@ def rodar(nivel, client):
     exatos = perto = total = 0
     for a in gold["samples"]:
         try:
-            obtido = avaliar(client, prompt, a)
+            obtido = avaliar(client, prompt, a, subs)
         except Exception as e:                      # noqa: BLE001
             print(f"{a['id']:<10}ERRO: {e}")
             continue

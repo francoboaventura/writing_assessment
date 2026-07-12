@@ -60,6 +60,22 @@
         color:var(--texto-fraco);cursor:pointer;transition:.15s}
   .drop:hover,.drop.over{border-color:var(--azul);background:#F0F6FC;color:var(--azul)}
   .drop img{max-width:100%;border-radius:8px;margin-top:12px}
+  .drop-mini{padding:12px;font-size:13px}
+  .drop-mini img{max-height:130px;object-fit:contain}
+  .drop .op{opacity:.7}
+  .btn-mini{padding:9px;font-size:13px;margin-top:8px}
+
+  /* Páginas da redação: a ordem na tela é a ordem que vai para a transcrição */
+  .paginas{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .pag{position:relative;width:64px;height:82px;border-radius:8px;overflow:hidden;
+       border:1px solid var(--cinza-linha);background:#fff}
+  .pag img{width:100%;height:100%;object-fit:cover}
+  .pag .num{position:absolute;left:0;bottom:0;background:var(--azul);color:#fff;font-size:11px;
+       font-weight:700;padding:1px 6px;border-radius:0 8px 0 0}
+  .pag .x{position:absolute;top:2px;right:2px;width:18px;height:18px;border:0;border-radius:50%;
+       background:rgba(26,35,48,.75);color:#fff;font-size:13px;line-height:1;cursor:pointer;padding:0}
+  .pag .x:hover{background:var(--vermelho)}
+  .pag-msg{align-self:center;font-size:12px;color:var(--texto-fraco)}
 
   .btn{margin-top:14px;width:100%;padding:14px;border:0;border-radius:999px;background:var(--azul);color:#fff;
        font-family:var(--corpo);font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
@@ -82,7 +98,8 @@
   .meta{font-size:13px;color:var(--texto-fraco)}
 
   .bar{margin:16px 0}
-  .bar .top{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px}
+  .bar .top{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px;gap:10px}
+  .bar .top .pt{color:var(--texto-fraco);font-weight:300}
   .track{height:9px;border-radius:999px;background:var(--cinza-linha);overflow:hidden}
   .fill{height:100%;border-radius:999px;transition:width .5s ease}
   .why{font-size:12.5px;color:var(--texto-fraco);margin-top:6px}
@@ -140,20 +157,29 @@
         <select id="tarefa"></select>
         <div class="hint" id="aviso-nivel" hidden></div>
 
-        <label for="enunciado">Enunciado da tarefa</label>
-        <textarea id="enunciado" style="min-height:80px" required
-          placeholder="Cole o enunciado que o aluno recebeu, exatamente como ele o viu."></textarea>
+        <label>Enunciado da tarefa</label>
+        <div class="drop drop-mini" id="drop-tarefa">
+          Foto ou print do enunciado <span class="op">(opcional)</span>
+          <input type="file" id="file-tarefa" accept="image/*,.heic,.heif" hidden>
+        </div>
+        <button class="btn btn-amarelo btn-mini" type="button" id="btn-ocr-tarefa" disabled>Transcrever o enunciado</button>
+        <textarea id="enunciado" style="min-height:90px" required
+          placeholder="Digite o enunciado, cole o texto dele — ou envie a foto acima para transcrever."></textarea>
+        <div class="hint" id="aviso-ocr-tarefa" hidden>
+          Transcrição do enunciado. <b>Confira</b> — é contra isso que o Content do aluno é medido.
+        </div>
 
         <label>Redação manuscrita (OCR)</label>
         <div class="drop" id="drop">
-          Clique ou arraste uma foto/scan da redação
-          <small style="display:block;margin-top:4px;opacity:.75">JPEG, PNG, WEBP ou HEIC (foto de iPhone)</small>
-          <input type="file" id="file" accept="image/*,.heic,.heif" hidden>
+          Clique ou arraste as fotos da redação
+          <small style="display:block;margin-top:4px;opacity:.75">Várias páginas de uma vez, na ordem · JPEG, PNG, WEBP ou HEIC</small>
+          <input type="file" id="file" accept="image/*,.heic,.heif" multiple hidden>
         </div>
-        <button class="btn btn-amarelo" type="button" id="btn-ocr" disabled>Transcrever a foto</button>
+        <div id="paginas" class="paginas"></div>
+        <button class="btn btn-amarelo" type="button" id="btn-ocr" disabled>Transcrever a redação</button>
 
         <label for="texto">Texto do aluno</label>
-        <textarea id="texto" placeholder="Cole o texto digitado — ou transcreva a foto acima."></textarea>
+        <textarea id="texto" placeholder="Veio digitado (e-mail, Docs)? Cole aqui e avalie — não precisa transcrever nada."></textarea>
         <div class="hint"><span id="contador">0</span> palavras · mínimo <span id="minimo">25</span></div>
         <div class="hint warn" id="aviso-ocr" hidden>
           Transcrição do OCR. <b>Confira com o aluno antes de avaliar</b> — erro de leitura não pode virar erro de escrita na nota.
@@ -190,11 +216,13 @@ const CORES = {
   organisation:              "var(--amarelo)",
   language:                  "var(--rosa)"
 };
+// Os nomes das subescalas são termos oficiais do Cambridge — ficam em inglês,
+// com a tradução ao lado, que é como o professor os encontra no guia.
 const NOMES = {
-  content: "Content",
-  communicative_achievement: "Communicative Achievement",
-  organisation: "Organisation",
-  language: "Language"
+  content:                   "Content <span class='pt'>· Conteúdo</span>",
+  communicative_achievement: "Communicative Achievement <span class='pt'>· Comunicação</span>",
+  organisation:              "Organisation <span class='pt'>· Organização</span>",
+  language:                  "Language <span class='pt'>· Linguagem</span>"
 };
 const CHIP = { DISTINCTION: "chip-dist", MERIT: "chip-merit", PASS: "chip-pass", UNSATISFACTORY: "chip-unsat" };
 
@@ -269,45 +297,82 @@ function aoTrocarTarefa(){
 const contar = t => t.trim() ? t.trim().split(/\s+/).length : 0;
 $("texto").addEventListener("input", () => $("contador").textContent = contar($("texto").value));
 
-/* ── Upload ── */
-const drop = $("drop"), file = $("file");
-let imagemBase64 = null;
-drop.addEventListener("click", () => file.click());
-drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
-drop.addEventListener("dragleave", () => drop.classList.remove("over"));
-drop.addEventListener("drop", e => {
-  e.preventDefault(); drop.classList.remove("over");
-  if (e.dataTransfer.files[0]) lerImagem(e.dataTransfer.files[0]);
-});
-file.addEventListener("change", () => file.files[0] && lerImagem(file.files[0]));
-
-/* Foto de iPhone chega em HEIC, que nem o Chrome decodifica nem a API aceita
-   (só jpeg/png/gif/webp). E foto de celular passa fácil dos 5 MB por imagem
-   que a API permite. Então: converte para JPEG e reduz antes de enviar. */
+/* ── Upload ──
+   Foto de iPhone chega em HEIC, que nem o Chrome decodifica nem a API aceita
+   (só jpeg/png/gif/webp). E foto de celular passa fácil dos 5 MB por imagem que
+   a API permite. Então tudo vira JPEG reduzido antes de sair do navegador. */
 const MAX_LADO = 2000;   // px — mais que isso não melhora a leitura da letra
 const QUALIDADE = 0.85;
 
-async function lerImagem(f){
-  const btn = $("btn-ocr");
-  drop.innerHTML = `<strong>${f.name}</strong><br><small>preparando imagem…</small>`;
+let paginas = [];        // redação: várias páginas, na ordem
+let imgTarefa = null;    // enunciado: uma imagem
+
+ligarDrop($("drop"), $("file"), true);
+ligarDrop($("drop-tarefa"), $("file-tarefa"), false);
+
+function ligarDrop(zona, input, multi){
+  zona.addEventListener("click", () => input.click());
+  zona.addEventListener("dragover", e => { e.preventDefault(); zona.classList.add("over"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("over"));
+  zona.addEventListener("drop", e => {
+    e.preventDefault(); zona.classList.remove("over");
+    receber([...e.dataTransfer.files], multi);
+  });
+  input.addEventListener("change", () => receber([...input.files], multi));
+}
+
+async function receber(arquivos, multi){
+  if (!arquivos.length) return;
+  const zona = multi ? $("drop") : $("drop-tarefa");
+  const btn  = multi ? $("btn-ocr") : $("btn-ocr-tarefa");
+  const originais = zona.innerHTML;
+
   btn.disabled = true;
+  zona.innerHTML = `<strong>Preparando ${arquivos.length} ${arquivos.length > 1 ? "imagens" : "imagem"}…</strong>`;
 
   try {
-    let blob = f;
+    const prontas = [];
+    for (const f of arquivos) prontas.push({ nome: f.name, url: await prepararImagem(f) });
 
-    if (/heic|heif/i.test(f.type) || /\.hei[cf]$/i.test(f.name)) {
-      drop.innerHTML = `<strong>${f.name}</strong><br><small>convertendo HEIC…</small>`;
-      blob = await heicParaJpeg(f);
+    if (multi) {
+      paginas = paginas.concat(prontas);   // acrescenta: dá para mandar página por página
+      zona.innerHTML = originais;
+      renderPaginas();
+    } else {
+      imgTarefa = prontas[0].url;
+      const kb = Math.round(imgTarefa.length * 0.75 / 1024);
+      zona.innerHTML = `<strong>${prontas[0].nome}</strong><br><small>pronta · ${kb} KB</small><img src="${imgTarefa}" alt="">`;
     }
-
-    imagemBase64 = await reduzirParaJpeg(blob);
-    const kb = Math.round(imagemBase64.length * 0.75 / 1024);
-    drop.innerHTML = `<strong>${f.name}</strong><br><small>pronta · ${kb} KB</small><img src="${imagemBase64}" alt="">`;
     btn.disabled = false;
   } catch (e) {
-    imagemBase64 = null;
-    drop.innerHTML = `<strong>Não consegui ler ${f.name}</strong><br><small>${e.message}<br>Tente JPEG ou PNG.</small>`;
+    zona.innerHTML = `<strong>Não consegui ler a imagem</strong><br><small>${e.message}<br>Tente JPEG ou PNG.</small>`;
   }
+}
+
+/* A ordem das páginas é a ordem da transcrição — por isso ela fica visível e removível. */
+function renderPaginas(){
+  const alvo = $("paginas");
+  if (!paginas.length) { alvo.innerHTML = ""; $("btn-ocr").disabled = true; return; }
+
+  alvo.innerHTML = paginas.map((p, i) => `
+    <div class="pag">
+      <img src="${p.url}" alt="">
+      <span class="num">${i + 1}</span>
+      <button type="button" class="x" data-i="${i}" title="Remover">×</button>
+    </div>`).join("") +
+    `<div class="pag-msg">${paginas.length} página${paginas.length > 1 ? "s" : ""}, nesta ordem</div>`;
+
+  alvo.querySelectorAll(".x").forEach(b => b.onclick = () => {
+    paginas.splice(+b.dataset.i, 1);
+    renderPaginas();
+  });
+  $("btn-ocr").disabled = false;
+}
+
+async function prepararImagem(f){
+  let blob = f;
+  if (/heic|heif/i.test(f.type) || /\.hei[cf]$/i.test(f.name)) blob = await heicParaJpeg(f);
+  return reduzirParaJpeg(blob);
 }
 
 /* Nenhum navegador além do Safari decodifica HEIC; carregamos o heic2any só quando precisa. */
@@ -350,30 +415,49 @@ function reduzirParaJpeg(blob){
 }
 
 /* ── Passo 1: OCR ── */
-$("btn-ocr").addEventListener("click", async () => {
-  if (!imagemBase64) return;
+$("btn-ocr").addEventListener("click", () => transcrever({
+  botao: "btn-ocr",
+  rotulo: "Transcrever a redação",
+  corpo: () => ({ images: paginas.map(p => p.url), mode: "learner" }),
+  aoChegar: texto => {
+    $("texto").value = texto;
+    $("contador").textContent = contar(texto);
+    $("aviso-ocr").hidden = false;
+    $("texto").focus();
+  }
+}));
+
+$("btn-ocr-tarefa").addEventListener("click", () => transcrever({
+  botao: "btn-ocr-tarefa",
+  rotulo: "Transcrever o enunciado",
+  corpo: () => ({ images: [imgTarefa], mode: "task" }),
+  aoChegar: texto => {
+    $("enunciado").value = texto;
+    $("aviso-ocr-tarefa").hidden = false;
+    $("aviso-ocr-tarefa").className = "hint warn";
+    $("enunciado").focus();
+  }
+}));
+
+async function transcrever({ botao, rotulo, corpo, aoChegar }){
   if (!CONFIG.apiUrl) return alert("Configure CONFIG.apiUrl com a URL do seu Worker.");
 
-  const b = $("btn-ocr");
+  const b = $(botao);
   b.disabled = true; b.textContent = "Transcrevendo…";
   try {
     const r = await fetch(CONFIG.apiUrl.replace(/\/$/, "") + "/transcribe", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imagemBase64 })
+      body: JSON.stringify(corpo())
     });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || "HTTP " + r.status);
-
-    $("texto").value = d.text;
-    $("contador").textContent = contar(d.text);
-    $("aviso-ocr").hidden = false;
-    $("texto").focus();
+    aoChegar(d.text);
   } catch (e) {
     alert("Falha na transcrição: " + e.message);
   } finally {
-    b.disabled = false; b.textContent = "Transcrever a foto";
+    b.disabled = false; b.textContent = rotulo;
   }
-});
+}
 
 /* ── Passo 2: avaliação ── */
 $("form").addEventListener("submit", async e => {

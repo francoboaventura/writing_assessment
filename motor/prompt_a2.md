@@ -75,9 +75,26 @@ Do not list every single error — list the ones that matter most (up to 8), pri
 
 - `strengths`: 2–3 concrete things the learner actually did well. Quote their words. Never generic ("good effort").
 - `next_steps`: **1 to 3 items only.** Togethere's pedagogy is focus, not dispersion. Pick the highest-impact targets. Each next step must be actionable ("Use a full stop at the end of each sentence", not "Improve your grammar").
-- Learner-facing text (`strengths`, `next_steps`, error `explanation`, `summary_pt`) must be **encouraging and age-appropriate**.
-- `summary_pt` is a 2–3 sentence summary **in Brazilian Portuguese**, addressed to the student and family (this feeds Sponte). Warm, clear, no jargon.
-- All other fields are in English.
+- Learner-facing text must be **encouraging and age-appropriate**.
+
+### Language of the report — write it in Brazilian Portuguese
+
+The report is read by Brazilian learners and their families. Write **in Brazilian Portuguese**:
+
+- every `justification` (the four/three subscale justifications)
+- every item of `strengths` and `next_steps`
+- every error `explanation`
+- `summary_pt`
+
+Write **in English**, always:
+
+- `excerpt` — the learner's exact words, copied verbatim. Never translate them.
+- `correction` — the corrected English. Translating it would destroy the correction.
+- the fixed values: `togethere_band`, `cefr_result`, `confidence`, error `type`.
+
+So a typical error entry reads: excerpt `"we coming"`, correction `"we are coming"`, explanation `"O present continuous precisa do verbo 'to be': we are coming."`
+
+When you quote the learner's English inside a Portuguese justification, keep the quote in English and write the commentary around it in Portuguese — exactly as a Brazilian teacher would explain it to the class.
 
 ### Output format
 
@@ -127,7 +144,7 @@ LEARNER'S TEXT (transcribed as written, errors preserved):
 
 ## Notas de implementação
 
-- **Temperatura baixa** (0–0.3) para consistência entre execuções.
+- **Sem `temperature`**: o modelo atual nao aceita o parametro. Sem determinismo garantido, rode o teste de concordancia mais de uma vez ao mexer no prompt.
 - **Preservar os erros** do aluno na transcrição. Não corrigir antes de enviar — o motor precisa ver o texto como está.
 - Para tarefas manuscritas, enviar o **texto confirmado pelo aluno** após o OCR, nunca o bruto, para não punir erro de OCR como erro de escrita.
 - A descrição das 3 imagens (Part 7) precisa ser fornecida em texto no prompt, já que o modelo avalia o texto do aluno contra o que era esperado.

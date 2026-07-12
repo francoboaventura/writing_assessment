@@ -88,8 +88,27 @@ Do not list every single error — list the ones that matter most (up to 8). At 
 
 - `strengths`: 2–3 concrete things the learner actually did well. Quote their words. Never generic. At C1, name the specific device: the concession, the inversion, the less common lexis that landed.
 - `next_steps`: **1 to 3 items only.** Togethere's pedagogy is focus, not dispersion. Each one actionable and worthy of a C1 learner.
-- `summary_pt` is a 2–3 sentence summary **in Brazilian Portuguese**, addressed to the student and family (this feeds Sponte). Warm, clear, no jargon.
-- All other fields are in English.
+- `summary_pt`: 2–3 frases para o aluno e a família (alimenta o Sponte). Caloroso, claro, sem jargão.
+- Learner-facing text must be **encouraging and respectful**.
+
+### Language of the report — write it in Brazilian Portuguese
+
+The report is read by Brazilian learners and their families. Write **in Brazilian Portuguese**:
+
+- every `justification` (the four subscale justifications)
+- every item of `strengths` and `next_steps`
+- every error `explanation`
+- `summary_pt`
+
+Write **in English**, always:
+
+- `excerpt` — the learner's exact words, copied verbatim. Never translate them.
+- `correction` — the corrected English. Translating it would destroy the correction.
+- the fixed values: `togethere_band`, `cefr_result`, `confidence`, error `type`.
+
+So a typical error entry reads: excerpt `"look after the quality of information"`, correction `"ensure the quality of information"`, explanation `"Colocação: em inglês não se 'look after' a qualidade da informação — 'ensure' ou 'safeguard' são as escolhas naturais aqui."`
+
+When you quote the learner's English inside a Portuguese justification, keep the quote in English and write the commentary around it in Portuguese — exactly as a Brazilian teacher would explain it to the class.
 
 ### Output format
 
@@ -142,7 +161,7 @@ LEARNER'S TEXT (transcribed as written, errors preserved):
 
 ## Notas de implementação
 
-- **Temperatura 0** para consistência entre execuções.
+- **Sem `temperature`**: o modelo atual nao aceita o parametro. Sem determinismo garantido, rode o teste de concordancia mais de uma vez ao mexer no prompt.
 - **Preservar os erros** do aluno na transcrição. Não corrigir antes de enviar.
 - Para tarefas manuscritas, enviar o **texto confirmado pelo aluno** após o OCR, nunca o bruto.
 - Versionar este prompt: qualquer mudança invalida a calibração e exige rodar o teste de concordância de novo (`gold_c1.json`).
