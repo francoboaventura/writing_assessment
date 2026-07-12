@@ -12,7 +12,7 @@ rules = [
 [vars]
 # Domínios autorizados a chamar a API. Troque pelo seu GitHub Pages.
 # Vírgula separa vários. "*" libera geral — use só em teste.
-ALLOWED_ORIGINS = "https://SEU-USUARIO.github.io"
+ALLOWED_ORIGINS = "https://francoboaventura.github.io"
 
 # Segredo (nunca no toml, nunca no git):
 #   npx wrangler secret put ANTHROPIC_API_KEY

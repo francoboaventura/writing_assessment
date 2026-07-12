@@ -68,44 +68,137 @@ export default {
 
 /* ── Passo 1: OCR ─────────────────────────────────────────────────────────── */
 
-async function transcribe({ image }, env) {
-  if (!image) throw bad("Envie a imagem da redação em 'image' (data URL).");
+/**
+ * Transcreve uma ou mais imagens.
+ *
+ * { images: [dataURL, ...], mode: "learner" | "task" }
+ *   learner (padrão) — redação do aluno. Preserva TODOS os erros, sem exceção.
+ *   task            — enunciado (print do livro, foto da tarefa). Aqui é o
+ *                     contrário: é um texto impresso e correto, e o que importa
+ *                     é capturar a estrutura (os pontos a responder, as notas).
+ *
+ * Várias páginas vão numa chamada só, na ordem enviada — o modelo vê a redação
+ * inteira e não pedaços soltos, o que importa para frases quebradas na virada
+ * da página.
+ */
+async function transcribe({ images, image, mode = "learner" }, env) {
+  const lista = images?.length ? images : (image ? [image] : []);
+  if (!lista.length) throw bad("Envie ao menos uma imagem em 'images' (data URL).");
+  if (lista.length > 8) throw bad("Máximo de 8 páginas por vez.", 413);
 
-  const m = /^data:(image\/[a-z+.-]+);base64,(.+)$/is.exec(image.trim());
-  if (!m) throw bad("Formato de imagem inválido. Esperado data URL base64.");
-  const [, media_type, data] = m;
+  const blocos = lista.map((img, i) => {
+    const m = /^data:(image\/[a-z+.-]+);base64,(.+)$/is.exec(String(img).trim());
+    if (!m) throw bad(`Página ${i + 1}: formato inválido. Esperado data URL base64.`);
+    const [, media_type, data] = m;
 
-  // A API aceita só estes quatro. HEIC (foto de iPhone) é convertido para JPEG
-  // no navegador antes de chegar aqui — ver reduzirParaJpeg() no index.html.
-  if (!FORMATOS.includes(media_type.toLowerCase())) {
-    throw bad(
-      media_type.includes("hei")
-        ? "HEIC não é aceito pela API. Converta para JPEG antes de enviar."
-        : `Formato ${media_type} não suportado. Use JPEG, PNG, GIF ou WEBP.`
-    );
-  }
-  if (data.length * 0.75 > 5 * 1024 * 1024)
-    throw bad("Imagem acima de 5 MB. Reduza a foto antes de enviar.", 413);
+    // A API aceita só estes quatro. HEIC (foto de iPhone) vira JPEG no navegador
+    // antes de chegar aqui — ver reduzirParaJpeg() no index.html.
+    if (!FORMATOS.includes(media_type.toLowerCase())) {
+      throw bad(
+        media_type.includes("hei")
+          ? `Página ${i + 1}: HEIC não é aceito pela API. Converta para JPEG.`
+          : `Página ${i + 1}: formato ${media_type} não suportado. Use JPEG, PNG, GIF ou WEBP.`
+      );
+    }
+    if (data.length * 0.75 > 5 * 1024 * 1024)
+      throw bad(`Página ${i + 1}: acima de 5 MB. Reduza a foto.`, 413);
 
-  const out = await claude(env, {
-    max_tokens: 2000,
-    temperature: 0,
-    system:
+    return { type: "image", source: { type: "base64", media_type, data } };
+  });
+
+  const SISTEMA = {
+    learner:
       "You transcribe handwritten English learner writing, exactly as written. " +
       "Preserve every spelling mistake, grammar error, capitalisation and punctuation exactly as the learner wrote it. " +
       "Do NOT correct anything — the assessment depends on seeing the original errors. " +
-      "Keep line breaks. If a word is genuinely illegible, write [?]. " +
-      "Return only the transcription, with no commentary.",
+      "Keep line breaks and paragraph breaks. If a word is genuinely illegible, write [?]. " +
+      "The images are consecutive pages of ONE text, in order: transcribe them as a single continuous text. " +
+      "If a sentence is cut across two pages, join it — do not repeat the words. " +
+      "Do not write page numbers or separators. Return only the transcription, with no commentary.",
+    task:
+      "You transcribe an English exam writing task from a photo or screenshot (a coursebook page, a worksheet, an exam paper). " +
+      "This is printed material, not learner writing: transcribe it accurately and faithfully. " +
+      "Capture the full instruction, the text the learner must respond to, every bullet point, every note in the margin, " +
+      "and any word limit — these are exactly what the assessment checks the learner against. " +
+      "Describe pictures only if the task is picture-based, and only in one short line each, like: [Picture 1: a boy missing the bus]. " +
+      "Keep the original structure and line breaks. Return only the transcription, with no commentary."
+  }[mode] ?? null;
+
+  if (!SISTEMA) throw bad("mode deve ser 'learner' ou 'task'.");
+
+  const pedido = mode === "task"
+    ? "Transcribe this writing task exactly as printed."
+    : "Transcribe this learner's writing exactly as written.";
+
+  const out = await claude(env, {
+    max_tokens: 4000,
+    system: SISTEMA,
     messages: [{
       role: "user",
-      content: [
-        { type: "image", source: { type: "base64", media_type, data } },
-        { type: "text", text: "Transcribe this learner's writing exactly as written." }
-      ]
+      content: [...blocos, { type: "text", text: pedido }]
     }]
   });
 
-  return { text: textOf(out).trim() };
+  return { text: textOf(out).trim(), pages: lista.length };
+}
+
+/* ── Esquema da avaliação ─────────────────────────────────────────────────────
+ * As subescalas mudam por nível (3 no A2, 4 do B1 pra cima), então o esquema é
+ * montado a partir de data/levels.json. O contrato dos campos é o mesmo descrito
+ * em "Output format" de cada motor/prompt_*.md — se mudar lá, mude aqui.
+ */
+function ferramenta(nivel) {
+  const PT = "EM PORTUGUÊS DO BRASIL.";
+
+  const subescala = {
+    type: "object",
+    properties: {
+      band: { type: "integer", minimum: 0, maximum: 5 },
+      justification: {
+        type: "string",
+        description: `${PT} Cita as palavras do aluno como evidência (as citações permanecem em inglês), como o comentário de um examinador Cambridge.`
+      }
+    },
+    required: ["band", "justification"]
+  };
+
+  const props = {};
+  for (const s of nivel.subscales) props[s] = subescala;
+
+  Object.assign(props, {
+    overall_band:   { type: "integer", minimum: 0, maximum: 5 },
+    togethere_band: { type: "string", enum: ["DISTINCTION", "MERIT", "PASS", "UNSATISFACTORY"] },
+    cefr_result:    { type: "string", description: `"${nivel.id.toUpperCase()} achieved" ou "below ${nivel.id.toUpperCase()}".` },
+    errors: {
+      type: "array",
+      maxItems: 8,
+      items: {
+        type: "object",
+        properties: {
+          excerpt:     { type: "string", description: "EM INGLÊS: as palavras exatas do aluno, copiadas como estão. Nunca traduzir." },
+          type:        { type: "string", enum: ["grammar", "vocabulary", "spelling", "punctuation", "cohesion", "register", "format"] },
+          correction:  { type: "string", description: "EM INGLÊS: a forma correta. Traduzir destruiria a correção." },
+          explanation: { type: "string", description: `${PT} Uma linha explicando o erro, no tom que o aluno entende.` }
+        },
+        required: ["excerpt", "type", "correction", "explanation"]
+      }
+    },
+    strengths:  { type: "array", minItems: 2, maxItems: 3, items: { type: "string" }, description: `${PT} O que funcionou bem, citando as palavras do aluno (a citação fica em inglês).` },
+    next_steps: { type: "array", minItems: 1, maxItems: 3, items: { type: "string" }, description: `${PT} Ações concretas para a próxima redação.` },
+    summary_pt: { type: "string", description: `${PT} 2–3 frases para o aluno e a família.` },
+    confidence: { type: "string", enum: ["high", "medium", "low"] }
+  });
+
+  return {
+    name: "submit_assessment",
+    description: "Entrega a avaliação da redação conforme a Cambridge Writing Assessment Scale.",
+    input_schema: {
+      type: "object",
+      properties: props,
+      required: [...nivel.subscales, "overall_band", "togethere_band", "cefr_result",
+                 "strengths", "next_steps", "summary_pt", "confidence"]
+    }
+  };
 }
 
 /* ── Passo 2: avaliação ───────────────────────────────────────────────────── */
@@ -121,10 +214,18 @@ async function assess({ level, task_part, task_prompt, text, student }, env) {
   if (!task_prompt?.trim()) throw bad("Envie o enunciado da tarefa em 'task_prompt'.");
   if (!text?.trim()) throw bad("Envie o texto do aluno em 'text'.");
 
+  // Sem `temperature`: o modelo atual não aceita mais esse parâmetro.
+  // Perdemos o determinismo que ela dava — a mesma redação pode variar um pouco
+  // entre execuções. É o test_concordancia.py que mede se essa variação cabe.
+  //
+  // A saída é obtida por tool use com esquema obrigatório, e não pedindo "responda
+  // em JSON". O modelo tem de preencher os campos definidos abaixo — não existe a
+  // possibilidade de vir prosa, cerca de markdown ou JSON malformado.
   const out = await claude(env, {
-    max_tokens: 3000,
-    temperature: 0, // os motores são calibrados em temperatura 0 — não mexa sem rodar test_concordancia.py
+    max_tokens: 8000,
     system: systemPrompt(level),
+    tools: [ferramenta(nivel)],
+    tool_choice: { type: "tool", name: "submit_assessment" },
     messages: [{
       role: "user",
       content:
@@ -134,7 +235,12 @@ async function assess({ level, task_part, task_prompt, text, student }, env) {
     }]
   });
 
-  const result = parseJson(textOf(out));
+  if (out.stop_reason === "max_tokens")
+    throw bad("A avaliação foi cortada por tamanho antes de terminar. Tente de novo; se repetir, o texto é longo demais para o teto atual.", 502);
+
+  const uso = (out.content ?? []).find(b => b.type === "tool_use");
+  if (!uso) throw bad(`O modelo não preencheu a avaliação. Resposta: ${textOf(out).slice(0, 200)}`, 502);
+  const result = uso.input;
 
   // Aritmética é nossa; julgamento é do motor.
   result.level = level;
@@ -186,8 +292,11 @@ function parseJson(raw) {
     return JSON.parse(clean);
   } catch {
     const s = clean.indexOf("{"), e = clean.lastIndexOf("}");
-    if (s === -1 || e === -1) throw bad("O modelo não devolveu JSON válido.", 502);
-    return JSON.parse(clean.slice(s, e + 1));
+    if (s !== -1 && e > s) {
+      try { return JSON.parse(clean.slice(s, e + 1)); } catch { /* cai abaixo */ }
+    }
+    // Mostra o começo do que veio: sem isso, "JSON inválido" não diz nada a ninguém.
+    throw bad(`O modelo não devolveu JSON válido. Início da resposta: ${clean.slice(0, 200)}`, 502);
   }
 }
 
