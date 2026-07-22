@@ -7,33 +7,70 @@
  * A transcrição é um passo separado de propósito: o aluno confere o texto do OCR
  * antes da avaliação, para que erro de leitura não vire erro de escrita na nota.
  *
- * NÍVEIS: cada nível tem seu próprio prompt (motor) e suas tarefas.
- *   a2 → motor/prompt_a2.md  (escala oficial Cambridge A2 Key)
- *   a1 → motor/prompt_a1.md  (descritores próprios da Togethere — Cambridge não tem A1)
- * Para adicionar B1/B2/C1: crie motor/prompt_b1.md etc. e registre em LEVELS abaixo.
+ * NÍVEIS
+ *  Base (régua CEFR):      a2 (Cambridge A2 Key), b1, b2, c1  +  a1 (descritores Togethere)
+ *  Trilhas Junior/Teens:
+ *    a1plus_junior / a2plus_junior / b1plus_teens  → "+"= nível CEFR consolidado → usa a régua cheia
+ *    a1_junior     / a2_junior     / b1_teens      → "meio caminho": mesma régua CEFR + CALIBRAÇÃO mais leve
+ *  A calibração NÃO é um prompt novo: é um bloco anexado ao prompt do nível que abaixa a barra
+ *  de aprovação para o ponto intermediário (estar "na metade" já passa).
+ *
+ * Para adicionar um nível: registre em LEVELS abaixo (e, se precisar de régua nova, crie o .md em motor/).
  *
  * Segredo: ANTHROPIC_API_KEY (wrangler secret put ANTHROPIC_API_KEY)
  */
 
-import SYSTEM_PROMPT_A2 from "../../motor/prompt_a2.md";
-import SYSTEM_PROMPT_A1 from "../../motor/prompt_a1.md";
+import SYSTEM_PROMPT_A1 from "../motor/prompt_a1.md";
+import SYSTEM_PROMPT_A2 from "../motor/prompt_a2.md";
+import SYSTEM_PROMPT_B1 from "../motor/prompt_b1.md";
+import SYSTEM_PROMPT_B2 from "../motor/prompt_b2.md";
+import SYSTEM_PROMPT_C1 from "../motor/prompt_c1.md";
 
 const MODEL = "claude-sonnet-5";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 const FORMATOS = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
-// Registro de níveis: prompt do motor + tarefas aceitas (com mínimo de palavras).
-// free_text é aceito em todos os níveis. Adicione novos níveis aqui quando o prompt existir.
+/* ── Tarefas aceitas por régua (task_part → mínimo de palavras) ───────────── */
+const T_A1 = { short_message: 20, about_me: 20, free_text: 20 };
+const T_A2 = { part6_email: 25, part7_story: 35, free_text: 25 };
+const T_B1 = { part1_email: 100, part2_article: 100, part2_story: 100, free_text: 100 };
+const T_B2 = { part1_essay: 140, part2_article: 140, part2_email: 140, part2_review: 140, part2_story: 140, free_text: 140 };
+const T_C1 = { part1_essay: 220, part2_letter: 220, part2_proposal: 220, part2_report: 220, part2_review: 220, free_text: 220 };
+
+/* ── Calibração "meio caminho" (anexada ao prompt do nível cheio) ─────────── */
+const HALF = (alvo) => `---
+
+CALIBRATION OVERRIDE — TOGETHERE "HALF LEVEL" (a caminho de ${alvo}).
+This is a Togethere Junior/Teens learner who is roughly HALFWAY to CEFR ${alvo} and has NOT yet consolidated ${alvo}. Apply the assessment scale above, but recalibrate GENEROUSLY to this learner's stage:
+- A text that shows the learner is genuinely on track toward ${alvo} — roughly half the range and control expected at full ${alvo} — MUST land in the PASS range (overall_band 3).
+- A solid, on-track "halfway" performance is MERIT (4) or DISTINCTION (5) at this level.
+- Reserve UNSATISFACTORY (overall_band 1-2) only for texts that show almost no progress toward ${alvo}.
+- Do NOT hold the learner to the full ${alvo} standard, and do not penalise for range/complexity that only a consolidated ${alvo} learner would show.
+- Set "cefr_result" to "On track to ${alvo}" when overall_band is 3 or higher, and "Below ${alvo} track" otherwise.
+- Write "summary_pt" and "next_steps" as encouraging, concrete progress toward ${alvo}.
+- Keep "needs_teacher_review": true.`;
+
+const HALF_A1 = HALF("A1");
+const HALF_A2 = HALF("A2");
+const HALF_B1 = HALF("B1");
+
+/* ── Registro de níveis ───────────────────────────────────────────────────── */
 const LEVELS = {
-  a1: {
-    prompt: SYSTEM_PROMPT_A1,
-    tasks: { short_message: 20, about_me: 20, free_text: 20 }
-  },
-  a2: {
-    prompt: SYSTEM_PROMPT_A2,
-    tasks: { part6_email: 25, part7_story: 35, free_text: 25 }
-  }
+  // genéricos (régua CEFR cheia)
+  a1: { prompt: SYSTEM_PROMPT_A1, tasks: T_A1 },
+  a2: { prompt: SYSTEM_PROMPT_A2, tasks: T_A2 },
+  b1: { prompt: SYSTEM_PROMPT_B1, tasks: T_B1 },
+  b2: { prompt: SYSTEM_PROMPT_B2, tasks: T_B2 },
+  c1: { prompt: SYSTEM_PROMPT_C1, tasks: T_C1 },
+  // trilha Junior/Teens — "+": CEFR consolidado (régua cheia)
+  a1plus_junior: { prompt: SYSTEM_PROMPT_A1, tasks: T_A1 },
+  a2plus_junior: { prompt: SYSTEM_PROMPT_A2, tasks: T_A2 },
+  b1plus_teens:  { prompt: SYSTEM_PROMPT_B1, tasks: T_B1 },
+  // trilha Junior/Teens — "meio caminho": régua cheia + calibração mais leve
+  a1_junior: { prompt: SYSTEM_PROMPT_A1, tasks: T_A1, calibration: HALF_A1 },
+  a2_junior: { prompt: SYSTEM_PROMPT_A2, tasks: T_A2, calibration: HALF_A2 },
+  b1_teens:  { prompt: SYSTEM_PROMPT_B1, tasks: T_B1, calibration: HALF_B1 },
 };
 
 export default {
@@ -65,8 +102,6 @@ async function transcribe({ image }, env) {
   if (!m) throw bad("Formato de imagem inválido. Esperado data URL base64.");
   const [, media_type, data] = m;
 
-  // A API aceita só estes quatro. HEIC (foto de iPhone) é convertido para JPEG
-  // no navegador antes de chegar aqui — ver reduzirParaJpeg() no index.html.
   if (!FORMATOS.includes(media_type.toLowerCase())) {
     throw bad(
       media_type.includes("hei")
@@ -75,7 +110,6 @@ async function transcribe({ image }, env) {
     );
   }
 
-  // Limite de 5 MB por imagem; base64 infla ~33%.
   if (data.length * 0.75 > 5 * 1024 * 1024)
     throw bad("Imagem acima de 5 MB. Reduza a foto antes de enviar.", 413);
 
@@ -115,10 +149,13 @@ async function assess({ level, task_part, task_prompt, text, student }, env) {
   if (!task_prompt?.trim()) throw bad("Envie o enunciado da tarefa em 'task_prompt'.");
   if (!text?.trim()) throw bad("Envie o texto do aluno em 'text'.");
 
+  // Nível "meio caminho": régua cheia + bloco de calibração mais leve anexado.
+  const system = lv.calibration ? (lv.prompt + "\n\n" + lv.calibration) : lv.prompt;
+
   const out = await claude(env, {
     max_tokens: 2000,
-    temperature: 0, // o motor é calibrado em temperatura 0 — não mexa sem rodar o teste de concordância
-    system: lv.prompt,
+    temperature: 0, // calibrado em temperatura 0 — não mexa sem rodar o teste de concordância
+    system,
     messages: [{
       role: "user",
       content:
@@ -132,12 +169,11 @@ async function assess({ level, task_part, task_prompt, text, student }, env) {
 
   const result = parseJson(textOf(out));
 
-  // O motor conta as palavras, mas conferimos aqui — é aritmética, não julgamento.
   result.word_count = text.trim().split(/\s+/).filter(Boolean).length;
   result.min_words = min;
   result.meets_word_minimum = result.word_count >= result.min_words;
-  result.needs_teacher_review = true; // sempre true durante o piloto
-  result.engine_version = "0.2";
+  result.needs_teacher_review = true;
+  result.engine_version = "0.3";
   result.assessed_at = new Date().toISOString();
   result.level = lvKey;
   if (student) result.student = student;
@@ -167,7 +203,6 @@ async function claude(env, payload) {
 const textOf = (res) => (res.content ?? []).filter(b => b.type === "text").map(b => b.text).join("");
 
 function parseJson(raw) {
-  // O prompt pede JSON puro, mas cercas de markdown acontecem. Toleramos.
   const clean = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
   try {
     return JSON.parse(clean);
